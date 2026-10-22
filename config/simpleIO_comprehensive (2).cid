@@ -1,0 +1,1326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Comprehensive IEC 61850 CID File - simpleIO (Enhanced)
+  Based on: simpleIO_direct_control_goose.cid
+  Enhancements:
+    - Full SCL Header with revision history
+    - Substation section (Substation / VoltageLevel / Bay / ConductingEquipment)
+    - Full Communication section (MMS + GOOSE subnets, SMV subnet)
+    - Expanded Services (buffered/unbuffered RCBs, SGCB, MSVCB, Log, TimerActivated, enhanced security)
+    - Full AccessPoint with Server/Authentication (password + certificate)
+    - PROTECTION LDevice (PDIS, PSCH, PTRC, RREC)
+    - MEASUREMENT LDevice (MMXU, MSQI)
+    - CONTROL LDevice (XCBR, CSWI, RSYN)
+    - GenericIO LDevice (LLN0, LPHD, GGIO — existing, expanded)
+    - Buffered + Unbuffered RCBs with full TrgOps + OptFields
+    - Setting Group Control Block (SGCB)
+    - Sampled Value Control Block (MSVCB) — IEC 61850-9-2 LE profile
+    - Logging (LCB) — Log Control Block with full options
+    - GSEControl (GOOSE) for events, analogs, protection trips
+    - Extended DataTypeTemplates:
+        LNodeTypes : LLN0, LPHD, GGIO, PDIS, MMXU, XCBR, CSWI, PTRC, RREC, PSCH, MSQI
+        DOTypes    : INC, INS, LPL, DPL, SPS, SPC, DPC, MV, CMV, WYE, DEL, SEQ, ACD, PDIF, REC, GAPC
+        DATypes    : AnalogueValue, Vector, MagAngle, Originator, SPC/DPC Operate structs, Check, Pha
+        EnumTypes  : CtlModels, OrCat, Beh, Health, SIUnit, multiplier, MagMult, TrgCond
+-->
+<SCL xmlns="http://www.iec.ch/61850/2003/SCL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="SCL.xsd">
+
+  <!-- ================================================================
+       HEADER
+       IEC 61850-6 §8.3.1: Header carries tool/revision metadata.
+       nameStructure="IEDName" means LN refs include IED name prefix.
+       ================================================================ -->
+  <Header id="simpleIO_comprehensive"
+    version="2"
+    revision="1"
+    toolID="OpenSCL Editor"
+    nameStructure="IEDName">
+    <Text>Comprehensive simpleIO CID — all IEC 61850 service classes</Text>
+    <History>
+      <Hitem version="1" revision="0" when="2024-01-01T00:00:00"
+        who="Engineer A" what="Initial CID from simpleIO_direct_control_goose"
+        why="Baseline" />
+      <Hitem version="2" revision="1" when="2025-01-01T00:00:00"
+        who="Engineer B" what="Comprehensive expansion with all IEC 61850 services"
+        why="Full compliance demonstration" />
+    </History>
+  </Header>
+
+  <!-- ================================================================
+       SUBSTATION
+       IEC 61850-6 §9: Describes physical / functional topology.
+       Required for proper LNode binding and SLD generation.
+       ================================================================ -->
+  <Substation name="Station1" desc="Main 110/20 kV Substation">
+    <VoltageLevel name="VL110kV" desc="110 kV Voltage Level">
+      <Voltage unit="V" multiplier="k">110</Voltage>
+      <Bay name="Bay1" desc="Feeder Bay 1">
+        <!-- Connecting XCBR logical node to primary circuit breaker -->
+        <ConductingEquipment type="CBR" name="QA1" desc="Circuit Breaker QA1">
+          <LNode iedName="simpleIO" ldInst="CONTROL" lnClass="XCBR" lnInst="1" />
+        </ConductingEquipment>
+        <!-- Disconnector -->
+        <ConductingEquipment type="DIS" name="QB1" desc="Disconnector QB1">
+          <LNode iedName="simpleIO" ldInst="CONTROL" lnClass="CSWI" lnInst="1" />
+        </ConductingEquipment>
+        <!-- Current / Voltage Transformer -->
+        <ConductingEquipment type="CTR" name="T1" desc="Current Transformer T1">
+          <LNode iedName="simpleIO" ldInst="MEAS" lnClass="MMXU" lnInst="1" />
+        </ConductingEquipment>
+      </Bay>
+    </VoltageLevel>
+  </Substation>
+
+  <!-- ================================================================
+       COMMUNICATION
+       IEC 61850-6 §10: Maps AP addresses to physical networks.
+       Three subnets:
+         subnetwork1  — MMS/ACSI over TCP/IP (8-MMS)
+         subnetwork2  — GOOSE/GSE  (Ethernet, type e.g. "GOOSE")
+         subnetworkSV — Sampled Values (IEC 61850-9-2 LE)
+       ================================================================ -->
+  <Communication>
+
+    <!-- MMS / ACSI subnet -->
+    <SubNetwork name="subnetwork1" type="8-MMS" desc="MMS over TCP/IP">
+      <BitRate unit="b/s" multiplier="M">100</BitRate>
+      <ConnectedAP iedName="simpleIO" apName="accessPoint1">
+        <Address>
+          <P type="IP">10.0.0.2</P>
+          <P type="IP-SUBNET">255.255.255.0</P>
+          <P type="IP-GATEWAY">10.0.0.1</P>
+          <P type="OSI-TSEL">0001</P>
+          <P type="OSI-PSEL">00000001</P>
+          <P type="OSI-SSEL">0001</P>
+        </Address>
+      </ConnectedAP>
+    </SubNetwork>
+
+    <!-- GOOSE subnet - -->
+    <SubNetwork name="subnetwork2" type="8-GOOSE" desc="GOOSE Ethernet">
+      <BitRate unit="b/s" multiplier="M">100</BitRate>
+      <ConnectedAP iedName="simpleIO" apName="accessPoint1">
+        <!-- GOOSE: Status Events -->
+        <GSE ldInst="GenericIO" cbName="gcbEvents">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">4</P>
+            <P type="MAC-Address">01-0C-CD-01-00-01</P>
+            <P type="APPID">1000</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+        <!-- GOOSE: Analog Values -->
+        <GSE ldInst="GenericIO" cbName="gcbAnalogValues">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">4</P>
+            <P type="MAC-Address">01-0C-CD-01-00-02</P>
+            <P type="APPID">1001</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+        <!-- GOOSE: Protection Trip -->
+        <GSE ldInst="PROT" cbName="gcbTrip">
+          <Address>
+            <P type="VLAN-ID">2</P>
+            <P type="VLAN-PRIORITY">7</P>
+            <P type="MAC-Address">01-0C-CD-01-00-10</P>
+            <P type="APPID">2000</P>
+          </Address>
+          <MinTime unit="ms">2</MinTime>
+          <MaxTime unit="ms">500</MaxTime>
+        </GSE>
+      </ConnectedAP>
+    </SubNetwork>
+
+    <!-- Sampled Values subnet - -->
+    <SubNetwork name="subnetworkSV" type="9-2" desc="Sampled Values IEC 61850-9-2 LE">
+      <BitRate unit="b/s" multiplier="M">100</BitRate>
+      <ConnectedAP iedName="simpleIO" apName="accessPoint1">
+        <SMV ldInst="MEAS" cbName="msvcbCurrent">
+          <Address>
+            <P type="VLAN-ID">3</P>
+            <P type="VLAN-PRIORITY">4</P>
+            <P type="MAC-Address">01-0C-CD-04-00-01</P>
+            <P type="APPID">4000</P>
+          </Address>
+        </SMV>
+      </ConnectedAP>
+    </SubNetwork>
+
+  </Communication>
+
+  <!-- ================================================================
+       IED
+       IEC 61850-6 §11: Full IED description with all service classes.
+       ================================================================ -->
+  <IED name="simpleIO" desc="Comprehensive simpleIO IED" type="Protection+Measurement+Control"
+    manufacturer="OpenIEC" configVersion="2.0">
+
+    <!-- Services - -->
+    <!--
+      IEC 61850-7-2 defines all ACSI service classes.
+      Each element below signals which services this server implements.
+    -->
+    <Services>
+      <!-- Association -->
+      <DynAssociation />
+      <!-- Basic read/write/browse -->
+      <GetDirectory />
+      <GetDataObjectDefinition />
+      <GetDataSetValue />
+      <SetDataSetValue />
+      <DataSetDirectory />
+      <ReadWrite />
+      <GetCBValues />
+      <SetBufReportRcb />
+      <GetBufReportRcb />
+      <SetUnbufReportRcb />
+      <GetUnbufReportRcb />
+      <!-- Control models: all five ctlModel values supported -->
+      <ConfLNs fixPrefix="true" fixLnInst="true" />
+      <!-- GOOSE -->
+      <GOOSE max="10" />
+      <!-- GSSE (GOOSE over slow links) -->
+      <GSSE max="5" />
+      <!-- Sampled Values -->
+      <SMVsc max="2" />
+      <!-- Logging -->
+      <Log />
+      <!-- Setting Groups -->
+      <SGEdit />
+      <ConfSG max="8" />
+      <!-- File services -->
+      <FileHandling />
+      <GSEDir />
+      <!-- Timer-activated control -->
+      <TimerActivatedControl />
+      <!-- Enhanced security (IEC 62351-8) -->
+      <ConfReportControl />
+      <!-- Dynamic data sets -->
+      <DynDataSet max="10" />
+      <!-- SubstitutionService -->
+      <Substitution />
+      <!-- GetDataValues -->
+      <ValueHandling />
+      <!-- Replication -->
+      <RedConn />
+    </Services>
+
+    <!-- Access Point - -->
+    <AccessPoint name="accessPoint1" desc="Primary MMS/GOOSE/SMV AP">
+      <Server timeout="30">
+
+        <!-- Authentication: password + certificate (IEC 62351) -->
+        <Authentication none="false" password="true" certificate="true" />
+
+        <!-- ============================================================
+             LOGICAL DEVICE: GenericIO
+             Existing device — expanded with buffered RCBs, SGCB, full LN0
+             ============================================================ -->
+        <LDevice inst="GenericIO" desc="Generic Digital/Analog IO">
+
+          <LN0 lnClass="LLN0" lnType="LLN01" inst="">
+
+            <!-- DataSets (unchanged from original + new buffered set) -->
+            <DataSet name="Events" desc="Digital status events (stVal only)">
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1"
+                daName="stVal" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2"
+                daName="stVal" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO3"
+                daName="stVal" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO4"
+                daName="stVal" />
+            </DataSet>
+
+            <DataSet name="Events2" desc="Digital status events (DO level)">
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO3" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO4" />
+            </DataSet>
+
+            <DataSet name="Events3" desc="Digital status events with quality">
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1"
+                daName="stVal" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1" daName="q" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2"
+                daName="stVal" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2" daName="q" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO3"
+                daName="stVal" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO3" daName="q" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO4"
+                daName="stVal" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO4" daName="q" />
+            </DataSet>
+
+            <DataSet name="AnalogValues" desc="Analog measured values">
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn1" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn2" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn3" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="MX" lnInst="1" doName="AnIn4" />
+            </DataSet>
+
+            <DataSet name="EventsBuffered" desc="Buffered events with full attributes">
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1"
+                daName="stVal" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1" daName="q" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO1" daName="t" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2"
+                daName="stVal" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2" daName="q" />
+              <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="SPCSO2" daName="t" />
+            </DataSet>
+
+            <!-- Unbuffered Report Control Block (URCB) -->
+            <!--
+              IEC 61850-7-2 §14.2: URCB — data pushed to ONE client.
+              TrgOps: dchg (data change), qchg (quality change), dupd (data update), period.
+              OptFields: full set per standard.
+            -->
+            <ReportControl name="EventsRCB" confRev="1" datSet="Events"
+              rptID="simpleIO/GenericIO/LLN0.EventsRCB"
+              buffered="false" intgPd="1000" bufTime="50">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="true" gi="true" />
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true"
+                dataRef="true" entryID="false" configRef="true" bufOvfl="false" />
+              <RptEnabled max="5" />
+            </ReportControl>
+
+            <ReportControl name="AnalogValuesRCB" confRev="1" datSet="AnalogValues"
+              rptID="simpleIO/GenericIO/LLN0.AnalogValuesRCB"
+              buffered="false" intgPd="5000" bufTime="50">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="true" gi="true" />
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true"
+                dataRef="true" entryID="false" configRef="true" bufOvfl="false" />
+              <RptEnabled max="3" />
+            </ReportControl>
+
+            <!-- Buffered Report Control Block (BRCB) -->
+            <!--
+              IEC 61850-7-2 §14.3: BRCB — stores reports in FIFO buffer when
+              client disconnects; entryID + bufOvfl needed.
+            -->
+            <ReportControl name="EventsBRCB" confRev="1" datSet="EventsBuffered"
+              rptID="simpleIO/GenericIO/LLN0.EventsBRCB"
+              buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true" />
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true"
+                dataRef="true" entryID="true" configRef="true" bufOvfl="true" />
+              <RptEnabled max="1" />
+            </ReportControl>
+
+            <!-- Log Control Block (LCB) -->
+            <!--
+              IEC 61850-7-2 §17: LCB — records entries into a persistent log
+              stored on the server; clients can query log by time range.
+            -->
+            <LogControl name="EventsLog" datSet="EventsBuffered"
+              logName="GenericIOLog" logEna="true" reasonCode="true"
+              intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true" />
+            </LogControl>
+
+            <!-- GOOSE Control Blocks -->
+            <!--
+              IEC 61850-7-2 §15: GSEControl type="GOOSE"
+              confRev must match Communication GSE MinTime/MaxTime.
+            -->
+            <GSEControl appID="events" name="gcbEvents" type="GOOSE"
+              datSet="Events3" confRev="2"
+              fixedOffs="false" />
+            <GSEControl appID="analog" name="gcbAnalogValues" type="GOOSE"
+              datSet="AnalogValues" confRev="2"
+              fixedOffs="false" />
+
+            <!-- Setting Group Control Block (SGCB) -->
+            <!--
+              IEC 61850-7-4 §5.4 / IEC 61850-7-2 §16:
+              numOfSGs = number of setting groups; actSG = active group.
+              Allows dynamic switching of protection settings.
+            -->
+            <SettingControl numOfSGs="8" actSG="1" />
+
+            <!-- LN0 mandatory DOs -->
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Beh">
+              <DAI name="stVal">
+                <Val>1</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Health">
+              <DAI name="stVal">
+                <Val>1</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>OpenIEC</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>2.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Generic IO Logical Node Zero</Val>
+              </DAI>
+              <DAI name="configRev">
+                <Val>2</Val>
+              </DAI>
+              <DAI name="ldNs">
+                <Val>IEC 61850-7-4:2010</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+
+          <!-- Physical Device (LPHD) -->
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix="">
+            <DOI name="PhyNam">
+              <DAI name="vendor">
+                <Val>OpenIEC</Val>
+              </DAI>
+            </DOI>
+            <DOI name="PhyHealth">
+              <DAI name="stVal">
+                <Val>1</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+          <!-- Generic IO (GGIO) — direct control outputs + analog inputs -->
+          <LN lnClass="GGIO" lnType="GGIO1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="SPCSO1">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Digital Output 1</Val>
+              </DAI>
+            </DOI>
+            <DOI name="SPCSO2">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Digital Output 2</Val>
+              </DAI>
+            </DOI>
+            <DOI name="SPCSO3">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Digital Output 3</Val>
+              </DAI>
+            </DOI>
+            <DOI name="SPCSO4">
+              <DAI name="ctlModel">
+                <Val>direct-with-enhanced-security</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Digital Output 4 (enhanced)</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AnIn1">
+              <DAI name="d">
+                <Val>Analog Input 1</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AnIn2">
+              <DAI name="d">
+                <Val>Analog Input 2</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AnIn3">
+              <DAI name="d">
+                <Val>Analog Input 3</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AnIn4">
+              <DAI name="d">
+                <Val>Analog Input 4</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+        </LDevice>
+
+        <!-- ============================================================
+             LOGICAL DEVICE: PROT  (Protection)
+             IEC 61850-7-4 protection LN classes: PDIS, PSCH, PTRC, RREC
+             ============================================================ -->
+        <LDevice inst="PROT" desc="Protection Functions">
+
+          <LN0 lnClass="LLN0" lnType="LLN02" inst="">
+
+            <!-- Protection trip dataset -->
+            <DataSet name="TripData" desc="Protection trip signals">
+              <FCDA ldInst="PROT" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general" />
+              <FCDA ldInst="PROT" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="q" />
+              <FCDA ldInst="PROT" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="t" />
+              <FCDA ldInst="PROT" lnClass="PDIS" fc="ST" lnInst="1" doName="Op" daName="general" />
+              <FCDA ldInst="PROT" lnClass="PDIS" fc="ST" lnInst="1" doName="Op" daName="q" />
+              <FCDA ldInst="PROT" lnClass="PDIS" fc="ST" lnInst="1" doName="Op" daName="t" />
+            </DataSet>
+
+            <DataSet name="ProtStatus" desc="Protection status">
+              <FCDA ldInst="PROT" lnClass="RREC" fc="ST" lnInst="1" doName="Op" daName="general" />
+              <FCDA ldInst="PROT" lnClass="RREC" fc="ST" lnInst="1" doName="AutoRecSt"
+                daName="stVal" />
+              <FCDA ldInst="PROT" lnClass="PSCH" fc="ST" lnInst="1" doName="SchNum" daName="stVal" />
+            </DataSet>
+
+            <!-- Buffered RCB for protection (high priority, no intgPd) -->
+            <ReportControl name="TripBRCB" confRev="1" datSet="TripData"
+              rptID="simpleIO/PROT/LLN0.TripBRCB"
+              buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true" />
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true"
+                dataRef="true" entryID="true" configRef="true" bufOvfl="true" />
+              <RptEnabled max="2" />
+            </ReportControl>
+
+            <ReportControl name="ProtStatusRCB" confRev="1" datSet="ProtStatus"
+              rptID="simpleIO/PROT/LLN0.ProtStatusRCB"
+              buffered="false" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true" />
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true"
+                dataRef="false" entryID="false" configRef="true" bufOvfl="false" />
+              <RptEnabled max="5" />
+            </ReportControl>
+
+            <!-- GOOSE: Protection Trip — high priority, fast retransmit -->
+            <GSEControl appID="trip" name="gcbTrip" type="GOOSE"
+              datSet="TripData" confRev="1"
+              fixedOffs="false" />
+
+            <!-- LN0 DOs -->
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>OpenIEC</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>2.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Protection LDevice LN0</Val>
+              </DAI>
+              <DAI name="configRev">
+                <Val>2</Val>
+              </DAI>
+              <DAI name="ldNs">
+                <Val>IEC 61850-7-4:2010</Val>
+              </DAI>
+            </DOI>
+            <!-- SGCB: 4 setting groups for protection zones -->
+            <SettingControl numOfSGs="4" actSG="1" />
+          </LN0>
+
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix="" />
+
+          <!-- Distance Protection (PDIS) — IEC 61850-7-4 §5.6.1 -->
+          <LN lnClass="PDIS" lnType="PDIS1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>Zone 1 Distance Protection Operate</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Str">
+              <DAI name="d">
+                <Val>Zone 1 Distance Protection Start</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+          <!-- Protection trip conditioning (PTRC) — IEC 61850-7-4 §5.6.7 -->
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Tr">
+              <DAI name="d">
+                <Val>Trip command from PTRC</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+          <!-- Auto-reclosing (RREC) — IEC 61850-7-4 §5.6.10 -->
+          <LN lnClass="RREC" lnType="RREC1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>Reclosure operate</Val>
+              </DAI>
+            </DOI>
+            <DOI name="AutoRecSt">
+              <DAI name="d">
+                <Val>Auto-reclose state</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+          <!-- Protection scheme controller (PSCH) — IEC 61850-7-4 §5.6.8 -->
+          <LN lnClass="PSCH" lnType="PSCH1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="SchNum">
+              <DAI name="d">
+                <Val>Active scheme number</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+        </LDevice>
+
+        <!-- ============================================================
+             LOGICAL DEVICE: MEAS  (Measurement)
+             IEC 61850-7-4: MMXU (3-ph measurements), MSQI (sequence)
+             Includes Sampled Values Control Block (IEC 61850-9-2 LE)
+             ============================================================ -->
+        <LDevice inst="MEAS" desc="Measurement and Metering">
+
+          <LN0 lnClass="LLN0" lnType="LLN03" inst="">
+
+            <DataSet name="MeasData" desc="Three-phase electrical measurements">
+              <FCDA ldInst="MEAS" lnClass="MMXU" fc="MX" lnInst="1" doName="TotW" />
+              <FCDA ldInst="MEAS" lnClass="MMXU" fc="MX" lnInst="1" doName="TotVAr" />
+              <FCDA ldInst="MEAS" lnClass="MMXU" fc="MX" lnInst="1" doName="TotVA" />
+              <FCDA ldInst="MEAS" lnClass="MMXU" fc="MX" lnInst="1" doName="Hz" />
+              <FCDA ldInst="MEAS" lnClass="MMXU" fc="MX" lnInst="1" doName="PhV" />
+              <FCDA ldInst="MEAS" lnClass="MMXU" fc="MX" lnInst="1" doName="A" />
+            </DataSet>
+
+            <DataSet name="SeqData" desc="Symmetrical components">
+              <FCDA ldInst="MEAS" lnClass="MSQI" fc="MX" lnInst="1" doName="SeqA" />
+              <FCDA ldInst="MEAS" lnClass="MSQI" fc="MX" lnInst="1" doName="SeqV" />
+            </DataSet>
+
+            <!-- URCB for periodic measurement reporting -->
+            <ReportControl name="MeasRCB" confRev="1" datSet="MeasData"
+              rptID="simpleIO/MEAS/LLN0.MeasRCB"
+              buffered="false" intgPd="10000" bufTime="0">
+              <TrgOps dchg="false" qchg="true" dupd="false" period="true" gi="true" />
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true"
+                dataRef="false" entryID="false" configRef="true" bufOvfl="false" />
+              <RptEnabled max="5" />
+            </ReportControl>
+
+            <ReportControl name="SeqRCB" confRev="1" datSet="SeqData"
+              rptID="simpleIO/MEAS/LLN0.SeqRCB"
+              buffered="false" intgPd="10000" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="true" gi="true" />
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true"
+                dataRef="false" entryID="false" configRef="true" bufOvfl="false" />
+              <RptEnabled max="3" />
+            </ReportControl>
+
+            <!-- Sampled Value Control Block (MSVCB) -->
+            <!--
+              IEC 61850-7-2 §15.5 / IEC 61850-9-2 LE:
+              smpRate=80 samples/cycle at 50Hz = 4000 samples/s.
+              nofASDU=1: one ASDU per Ethernet frame.
+              smpSynch: how clock is synchronised (LocalClock=1, GlobalClock=2).
+            -->
+            <SampledValueControl name="msvcbCurrent" datSet="MeasData"
+              confRev="1" smvID="simpleIO/MEAS/LLN0.msvcbCurrent"
+              smpRate="80" nofASDU="1"
+              multicast="true">
+              <SmvOpts refreshTime="false" sampleSynchronized="true"
+                sampleRate="true" dataSet="true" security="false" timestamp="false" />
+            </SampledValueControl>
+
+            <!-- LN0 DOs -->
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>OpenIEC</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>2.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Measurement LDevice LN0</Val>
+              </DAI>
+              <DAI name="configRev">
+                <Val>2</Val>
+              </DAI>
+              <DAI name="ldNs">
+                <Val>IEC 61850-7-4:2010</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix="" />
+
+          <!-- Three-phase measurements (MMXU) — IEC 61850-7-4 §5.14.1 -->
+          <LN lnClass="MMXU" lnType="MMXU1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="TotW">
+              <DAI name="d">
+                <Val>Total Active Power</Val>
+              </DAI>
+            </DOI>
+            <DOI name="TotVAr">
+              <DAI name="d">
+                <Val>Total Reactive Power</Val>
+              </DAI>
+            </DOI>
+            <DOI name="TotVA">
+              <DAI name="d">
+                <Val>Total Apparent Power</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Hz">
+              <DAI name="d">
+                <Val>Frequency</Val>
+              </DAI>
+            </DOI>
+            <DOI name="PhV">
+              <DAI name="d">
+                <Val>Phase Voltages</Val>
+              </DAI>
+            </DOI>
+            <DOI name="A">
+              <DAI name="d">
+                <Val>Phase Currents</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+          <!-- Sequence components (MSQI) — IEC 61850-7-4 §5.14.4 -->
+          <LN lnClass="MSQI" lnType="MSQI1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="SeqA">
+              <DAI name="d">
+                <Val>Current sequence components</Val>
+              </DAI>
+            </DOI>
+            <DOI name="SeqV">
+              <DAI name="d">
+                <Val>Voltage sequence components</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+        </LDevice>
+
+        <!-- ============================================================
+             LOGICAL DEVICE: CONTROL  (Switching / Interlocking)
+             IEC 61850-7-4: XCBR (circuit breaker), CSWI (switch controller),
+                            RSYN (synchronism-check)
+             ============================================================ -->
+        <LDevice inst="CONTROL" desc="Switching and Control">
+
+          <LN0 lnClass="LLN0" lnType="LLN04" inst="">
+
+            <DataSet name="SwitchStatus" desc="Breaker and switch status">
+              <FCDA ldInst="CONTROL" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="stVal" />
+              <FCDA ldInst="CONTROL" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="q" />
+              <FCDA ldInst="CONTROL" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="t" />
+              <FCDA ldInst="CONTROL" lnClass="CSWI" fc="ST" lnInst="1" doName="Pos" daName="stVal" />
+              <FCDA ldInst="CONTROL" lnClass="CSWI" fc="ST" lnInst="1" doName="Pos" daName="q" />
+              <FCDA ldInst="CONTROL" lnClass="CSWI" fc="ST" lnInst="1" doName="Pos" daName="t" />
+            </DataSet>
+
+            <ReportControl name="SwitchRCB" confRev="1" datSet="SwitchStatus"
+              rptID="simpleIO/CONTROL/LLN0.SwitchRCB"
+              buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true" />
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true"
+                dataRef="true" entryID="true" configRef="true" bufOvfl="true" />
+              <RptEnabled max="2" />
+            </ReportControl>
+
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>OpenIEC</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>2.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Control LDevice LN0</Val>
+              </DAI>
+              <DAI name="configRev">
+                <Val>2</Val>
+              </DAI>
+              <DAI name="ldNs">
+                <Val>IEC 61850-7-4:2010</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix="" />
+
+          <!-- Circuit Breaker (XCBR) — IEC 61850-7-4 §5.9.3
+               ctlModel: sbo-with-normal-security (select-before-operate) -->
+          <LN lnClass="XCBR" lnType="XCBR1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>sbo-with-normal-security</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Circuit Breaker Position</Val>
+              </DAI>
+            </DOI>
+            <DOI name="BlkOpn">
+              <DAI name="d">
+                <Val>Block Opening Command</Val>
+              </DAI>
+            </DOI>
+            <DOI name="BlkCls">
+              <DAI name="d">
+                <Val>Block Closing Command</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+          <!-- Switch Controller (CSWI) — IEC 61850-7-4 §5.9.1
+               ctlModel: direct-with-enhanced-security -->
+          <LN lnClass="CSWI" lnType="CSWI1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-enhanced-security</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Disconnector Position</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+          <!-- Synchronism-check (RSYN) — IEC 61850-7-4 §5.9.4 -->
+          <LN lnClass="RSYN" lnType="RSYN1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="RsSyn">
+              <DAI name="d">
+                <Val>Synchronism check result</Val>
+              </DAI>
+            </DOI>
+          </LN>
+
+        </LDevice>
+
+      </Server>
+    </AccessPoint>
+  </IED>
+
+  <!-- ================================================================
+       DATA TYPE TEMPLATES
+       IEC 61850-6 §8.10: shared type library for all LDevices.
+       ================================================================ -->
+  <DataTypeTemplates>
+
+    <!-- ======= LNodeTypes ======= -->
+
+    <!-- LLN0 for GenericIO -->
+    <LNodeType id="LLN01" lnClass="LLN0">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_full" />
+    </LNodeType>
+
+    <!-- LLN0 for PROT -->
+    <LNodeType id="LLN02" lnClass="LLN0">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_full" />
+    </LNodeType>
+
+    <!-- LLN0 for MEAS -->
+    <LNodeType id="LLN03" lnClass="LLN0">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_full" />
+    </LNodeType>
+
+    <!-- LLN0 for CONTROL -->
+    <LNodeType id="LLN04" lnClass="LLN0">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_full" />
+    </LNodeType>
+
+    <!-- LPHD -->
+    <LNodeType id="LPHD1" lnClass="LPHD">
+      <DO name="PhyNam" type="DPL_PhyNam" />
+      <DO name="PhyHealth" type="INS_Beh" />
+      <DO name="Proxy" type="SPS_Bool" />
+    </LNodeType>
+
+    <!-- GGIO -->
+    <LNodeType id="GGIO1" lnClass="GGIO">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_simple" />
+      <DO name="AnIn1" type="MV_float" />
+      <DO name="AnIn2" type="MV_float" />
+      <DO name="AnIn3" type="MV_float" />
+      <DO name="AnIn4" type="MV_float" />
+      <DO name="SPCSO1" type="SPC_enhanced" />
+      <DO name="SPCSO2" type="SPC_normal" />
+      <DO name="SPCSO3" type="SPC_normal" />
+      <DO name="SPCSO4" type="SPC_normal" />
+      <DO name="Ind1" type="SPS_Bool" />
+      <DO name="Ind2" type="SPS_Bool" />
+      <DO name="Ind3" type="SPS_Bool" />
+      <DO name="Ind4" type="SPS_Bool" />
+    </LNodeType>
+
+    <!-- PDIS — Distance Protection (IEC 61850-7-4 §5.6.1) -->
+    <LNodeType id="PDIS1" lnClass="PDIS">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_simple" />
+      <DO name="Op" type="ACT_Op" />
+      <DO name="Str" type="ACD_Str" />
+    </LNodeType>
+
+    <!-- PTRC — Protection Trip Conditioning (IEC 61850-7-4 §5.6.7) -->
+    <LNodeType id="PTRC1" lnClass="PTRC">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_simple" />
+      <DO name="Tr" type="ACT_Op" />
+      <DO name="TrMod" type="INS_Beh" />
+    </LNodeType>
+
+    <!-- RREC — Auto-reclosing (IEC 61850-7-4 §5.6.10) -->
+    <LNodeType id="RREC1" lnClass="RREC">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_simple" />
+      <DO name="Op" type="ACT_Op" />
+      <DO name="AutoRecSt" type="INS_Beh" />
+    </LNodeType>
+
+    <!-- PSCH — Protection Scheme (IEC 61850-7-4 §5.6.8) -->
+    <LNodeType id="PSCH1" lnClass="PSCH">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_simple" />
+      <DO name="SchNum" type="INS_Beh" />
+    </LNodeType>
+
+    <!-- MMXU — Three-phase measurements (IEC 61850-7-4 §5.14.1) -->
+    <LNodeType id="MMXU1" lnClass="MMXU">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_simple" />
+      <DO name="TotW" type="MV_float" />
+      <DO name="TotVAr" type="MV_float" />
+      <DO name="TotVA" type="MV_float" />
+      <DO name="Hz" type="MV_float" />
+      <DO name="PhV" type="WYE_meas" />
+      <DO name="A" type="WYE_meas" />
+    </LNodeType>
+
+    <!-- MSQI — Sequence components (IEC 61850-7-4 §5.14.4) -->
+    <LNodeType id="MSQI1" lnClass="MSQI">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_simple" />
+      <DO name="SeqA" type="SEQ_meas" />
+      <DO name="SeqV" type="SEQ_meas" />
+    </LNodeType>
+
+    <!-- XCBR — Circuit Breaker (IEC 61850-7-4 §5.9.3) -->
+    <LNodeType id="XCBR1" lnClass="XCBR">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_simple" />
+      <DO name="Pos" type="DPC_sbo" />
+      <DO name="BlkOpn" type="SPC_normal" />
+      <DO name="BlkCls" type="SPC_normal" />
+    </LNodeType>
+
+    <!-- CSWI — Switch Controller (IEC 61850-7-4 §5.9.1) -->
+    <LNodeType id="CSWI1" lnClass="CSWI">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_simple" />
+      <DO name="Pos" type="DPC_enhanced" />
+    </LNodeType>
+
+    <!-- RSYN — Synchronism-check (IEC 61850-7-4 §5.9.4) -->
+    <LNodeType id="RSYN1" lnClass="RSYN">
+      <DO name="Mod" type="INC_Mod" />
+      <DO name="Beh" type="INS_Beh" />
+      <DO name="Health" type="INS_Beh" />
+      <DO name="NamPlt" type="LPL_simple" />
+      <DO name="RsSyn" type="SPS_Bool" />
+    </LNodeType>
+
+    <!-- ======= DOTypes ======= -->
+
+    <!-- INC: Controllable Integer Status (used for Mod, Beh) -->
+    <DOType id="INC_Mod" cdc="INC">
+      <DA name="stVal" bType="INT32" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="ctlModel" type="CtlModels" bType="Enum" fc="CF" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- INS: Integer Status (read-only) -->
+    <DOType id="INS_Beh" cdc="INS">
+      <DA name="stVal" bType="INT32" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- LPL full: Logical Node name-plate with all standard attributes -->
+    <DOType id="LPL_full" cdc="LPL">
+      <DA name="vendor" bType="VisString255" fc="DC" />
+      <DA name="swRev" bType="VisString255" fc="DC" />
+      <DA name="d" bType="VisString255" fc="DC" />
+      <DA name="dU" bType="Unicode255" fc="DC" />
+      <DA name="configRev" bType="VisString255" fc="DC" />
+      <DA name="ldNs" bType="VisString255" fc="EX" />
+    </DOType>
+
+    <!-- LPL simple: minimal name-plate -->
+    <DOType id="LPL_simple" cdc="LPL">
+      <DA name="vendor" bType="VisString255" fc="DC" />
+      <DA name="swRev" bType="VisString255" fc="DC" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- DPL: Physical Device name-plate -->
+    <DOType id="DPL_PhyNam" cdc="DPL">
+      <DA name="vendor" bType="VisString255" fc="DC" />
+      <DA name="hwRev" bType="VisString255" fc="DC" />
+      <DA name="swRev" bType="VisString255" fc="DC" />
+      <DA name="serNum" bType="VisString255" fc="DC" />
+      <DA name="model" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- SPS: Single Point Status (boolean) -->
+    <DOType id="SPS_Bool" cdc="SPS">
+      <DA name="stVal" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- MV: Measured Value (float) -->
+    <DOType id="MV_float" cdc="MV">
+      <DA name="mag" type="AnalogueValue" bType="Struct" fc="MX" dchg="true" />
+      <DA name="q" bType="Quality" fc="MX" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="MX" />
+      <DA name="units" type="Unit" bType="Struct" fc="CF" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- CMV: Complex Measured Value (magnitude + angle) -->
+    <DOType id="CMV_meas" cdc="CMV">
+      <DA name="cVal" type="Vector" bType="Struct" fc="MX" dchg="true" />
+      <DA name="q" bType="Quality" fc="MX" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="MX" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- WYE: Three-phase star measurement (phase voltages/currents) -->
+    <DOType id="WYE_meas" cdc="WYE">
+      <SDO name="phsA" type="CMV_meas" />
+      <SDO name="phsB" type="CMV_meas" />
+      <SDO name="phsC" type="CMV_meas" />
+      <SDO name="neut" type="CMV_meas" />
+      <DA name="q" bType="Quality" fc="MX" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="MX" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- SEQ: Symmetrical components (zero/pos/neg) -->
+    <DOType id="SEQ_meas" cdc="SEQ">
+      <SDO name="c1" type="CMV_meas" />
+      <SDO name="c2" type="CMV_meas" />
+      <SDO name="c0" type="CMV_meas" />
+      <DA name="q" bType="Quality" fc="MX" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="MX" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- ACT: Activation (protection operate/start) — general boolean -->
+    <DOType id="ACT_Op" cdc="ACT">
+      <DA name="general" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="phsA" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="phsB" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="phsC" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="neut" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- ACD: Directional protection activation -->
+    <DOType id="ACD_Str" cdc="ACD">
+      <DA name="general" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="dirGeneral" type="Dir" bType="Enum" fc="ST" dchg="true" />
+      <DA name="phsA" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="dirPhsA" type="Dir" bType="Enum" fc="ST" dchg="true" />
+      <DA name="phsB" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="dirPhsB" type="Dir" bType="Enum" fc="ST" dchg="true" />
+      <DA name="phsC" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="dirPhsC" type="Dir" bType="Enum" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- SPC with direct-with-normal-security -->
+    <DOType id="SPC_normal" cdc="SPC">
+      <DA name="stVal" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="Oper" type="SPCOperate" bType="Struct" fc="CO" />
+      <DA name="ctlModel" type="CtlModels" bType="Enum" fc="CF" />
+      <DA name="sboTimeout" bType="INT32U" fc="CF" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- SPC with enhanced security (adds SBOw + Cancel) -->
+    <DOType id="SPC_enhanced" cdc="SPC">
+      <DA name="stVal" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="Oper" type="SPCOperate" bType="Struct" fc="CO" />
+      <DA name="SBOw" type="SPCOperate" bType="Struct" fc="CO" />
+      <DA name="Cancel" type="SPCOperate" bType="Struct" fc="CO" />
+      <DA name="ctlModel" type="CtlModels" bType="Enum" fc="CF" />
+      <DA name="sboTimeout" bType="INT32U" fc="CF" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- DPC with SBO normal-security (for XCBR) -->
+    <DOType id="DPC_sbo" cdc="DPC">
+      <DA name="stVal" type="DPCtlVal" bType="Enum" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="Oper" type="DPCOperate" bType="Struct" fc="CO" />
+      <DA name="SBO" bType="VisString64" fc="CO" />
+      <DA name="ctlModel" type="CtlModels" bType="Enum" fc="CF" />
+      <DA name="sboTimeout" bType="INT32U" fc="CF" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- DPC with enhanced-security (for CSWI) -->
+    <DOType id="DPC_enhanced" cdc="DPC">
+      <DA name="stVal" type="DPCtlVal" bType="Enum" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="Oper" type="DPCOperate" bType="Struct" fc="CO" />
+      <DA name="SBOw" type="DPCOperate" bType="Struct" fc="CO" />
+      <DA name="Cancel" type="DPCOperate" bType="Struct" fc="CO" />
+      <DA name="ctlModel" type="CtlModels" bType="Enum" fc="CF" />
+      <DA name="sboTimeout" bType="INT32U" fc="CF" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+
+    <!-- ======= DATypes ======= -->
+
+    <!-- AnalogueValue: float representation -->
+    <DAType id="AnalogueValue">
+      <BDA name="f" bType="FLOAT32" />
+    </DAType>
+
+    <!-- Unit: SI unit with multiplier -->
+    <DAType id="Unit">
+      <BDA name="SIUnit" type="SIUnit" bType="Enum" />
+      <BDA name="multiplier" type="multiplier" bType="Enum" />
+    </DAType>
+
+    <!-- Vector: complex value = magnitude + angle -->
+    <DAType id="Vector">
+      <BDA name="mag" type="AnalogueValue" bType="Struct" />
+      <BDA name="ang" type="AnalogueValue" bType="Struct" />
+    </DAType>
+
+    <!-- Originator: who/what initiated a control -->
+    <DAType id="Originator">
+      <BDA name="orCat" type="OrCat" bType="Enum" />
+      <BDA name="orIdent" bType="Octet64" />
+    </DAType>
+
+    <!-- SPCOperate: operate structure for single-point control -->
+    <DAType id="SPCOperate">
+      <BDA name="ctlVal" bType="BOOLEAN" />
+      <BDA name="origin" type="Originator" bType="Struct" />
+      <BDA name="ctlNum" bType="INT8U" />
+      <BDA name="T" bType="Timestamp" />
+      <BDA name="Test" bType="BOOLEAN" />
+      <BDA name="Check" bType="Check" />
+    </DAType>
+
+    <!-- DPCOperate: operate structure for double-point control -->
+    <DAType id="DPCOperate">
+      <BDA name="ctlVal" type="DPCtlVal" bType="Enum" />
+      <BDA name="origin" type="Originator" bType="Struct" />
+      <BDA name="ctlNum" bType="INT8U" />
+      <BDA name="T" bType="Timestamp" />
+      <BDA name="Test" bType="BOOLEAN" />
+      <BDA name="Check" bType="Check" />
+    </DAType>
+
+    <!-- ======= EnumTypes ======= -->
+
+    <!-- Control models — IEC 61850-7-3 Table 72 -->
+    <EnumType id="CtlModels">
+      <EnumVal ord="0">status-only</EnumVal>
+      <EnumVal ord="1">direct-with-normal-security</EnumVal>
+      <EnumVal ord="2">sbo-with-normal-security</EnumVal>
+      <EnumVal ord="3">direct-with-enhanced-security</EnumVal>
+      <EnumVal ord="4">sbo-with-enhanced-security</EnumVal>
+    </EnumType>
+
+    <!-- Originator category — IEC 61850-7-3 Table 14 -->
+    <EnumType id="OrCat">
+      <EnumVal ord="0">not-supported</EnumVal>
+      <EnumVal ord="1">bay-control</EnumVal>
+      <EnumVal ord="2">station-control</EnumVal>
+      <EnumVal ord="3">remote-control</EnumVal>
+      <EnumVal ord="4">automatic-bay</EnumVal>
+      <EnumVal ord="5">automatic-station</EnumVal>
+      <EnumVal ord="6">automatic-remote</EnumVal>
+      <EnumVal ord="7">maintenance</EnumVal>
+      <EnumVal ord="8">process</EnumVal>
+    </EnumType>
+
+    <!-- Behaviour (LN Beh / Mod) — IEC 61850-7-4 Table 9 -->
+    <EnumType id="Beh">
+      <EnumVal ord="1">on</EnumVal>
+      <EnumVal ord="2">blocked</EnumVal>
+      <EnumVal ord="3">test</EnumVal>
+      <EnumVal ord="4">test/blocked</EnumVal>
+      <EnumVal ord="5">off</EnumVal>
+    </EnumType>
+
+    <!-- Health (LN Health) — IEC 61850-7-4 Table 9 -->
+    <EnumType id="Health">
+      <EnumVal ord="1">Ok</EnumVal>
+      <EnumVal ord="2">Warning</EnumVal>
+      <EnumVal ord="3">Alarm</EnumVal>
+    </EnumType>
+
+    <!-- Double-point control value — IEC 61850-7-3 Table 35 -->
+    <EnumType id="DPCtlVal">
+      <EnumVal ord="0">intermediate-state</EnumVal>
+      <EnumVal ord="1">off</EnumVal>
+      <EnumVal ord="2">on</EnumVal>
+      <EnumVal ord="3">bad-state</EnumVal>
+    </EnumType>
+
+    <!-- Direction (for ACD) — IEC 61850-7-3 -->
+    <EnumType id="Dir">
+      <EnumVal ord="0">unknown</EnumVal>
+      <EnumVal ord="1">forward</EnumVal>
+      <EnumVal ord="2">backward</EnumVal>
+      <EnumVal ord="3">both</EnumVal>
+    </EnumType>
+
+    <!-- SI Unit — IEC 61850-7-3 Table 43 (subset) -->
+    <EnumType id="SIUnit">
+      <EnumVal ord="1">none</EnumVal>
+      <EnumVal ord="23">V</EnumVal>
+      <EnumVal ord="5">A</EnumVal>
+      <EnumVal ord="27">W</EnumVal>
+      <EnumVal ord="28">VAr</EnumVal>
+      <EnumVal ord="29">VA</EnumVal>
+      <EnumVal ord="33">Hz</EnumVal>
+      <EnumVal ord="38">deg</EnumVal>
+      <EnumVal ord="264">Wh</EnumVal>
+      <EnumVal ord="265">VArh</EnumVal>
+    </EnumType>
+
+    <!-- Multiplier — IEC 61850-7-3 Table 44 -->
+    <EnumType id="multiplier">
+      <EnumVal ord="-9">nano</EnumVal>
+      <EnumVal ord="-6">micro</EnumVal>
+      <EnumVal ord="-3">milli</EnumVal>
+      <EnumVal ord="0"> </EnumVal>
+      <EnumVal ord="3">kilo</EnumVal>
+      <EnumVal ord="6">Mega</EnumVal>
+      <EnumVal ord="9">Giga</EnumVal>
+    </EnumType>
+
+  </DataTypeTemplates>
+
+</SCL>

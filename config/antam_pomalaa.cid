@@ -1,0 +1,1575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SCL xmlns="http://www.iec.ch/61850/2003/SCL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Header id="kVSAS" version="1" revision="0" toolID="SAS_Generator" nameStructure="IEDName">
+    <Text>GI 150kV SAS Simulator</Text>
+  </Header>
+  <Substation name="GI_kVSAS" desc="GI 150kV">
+    <VoltageLevel name="VL150kV" desc="150 kV Voltage Level">
+      <Voltage unit="V" multiplier="k">150</Voltage>
+      <Bay name="E01" desc="Transformer-1">
+        <ConductingEquipment type="CBR" name="QA1">
+          <LNode iedName="SASSIM" ldInst="E01BCU" lnClass="XCBR" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="DIS" name="QB1">
+          <LNode iedName="SASSIM" ldInst="E01BCU" lnClass="CSWI" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="CTR" name="T1">
+          <LNode iedName="SASSIM" ldInst="E01P643" lnClass="MMXU" lnInst="1"/>
+        </ConductingEquipment>
+      </Bay>
+      <Bay name="E02" desc="Transformer-2">
+        <ConductingEquipment type="CBR" name="QA1">
+          <LNode iedName="SASSIM" ldInst="E02BCU" lnClass="XCBR" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="DIS" name="QB1">
+          <LNode iedName="SASSIM" ldInst="E02BCU" lnClass="CSWI" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="CTR" name="T1">
+          <LNode iedName="SASSIM" ldInst="E02P643" lnClass="MMXU" lnInst="1"/>
+        </ConductingEquipment>
+      </Bay>
+      <Bay name="E03" desc="Transformer-3">
+        <ConductingEquipment type="CBR" name="QA1">
+          <LNode iedName="SASSIM" ldInst="E03BCU" lnClass="XCBR" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="DIS" name="QB1">
+          <LNode iedName="SASSIM" ldInst="E03BCU" lnClass="CSWI" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="CTR" name="T1">
+          <LNode iedName="SASSIM" ldInst="E03P643" lnClass="MMXU" lnInst="1"/>
+        </ConductingEquipment>
+      </Bay>
+      <Bay name="E04" desc="Coupler">
+        <ConductingEquipment type="CBR" name="QA1">
+          <LNode iedName="SASSIM" ldInst="E04BCU" lnClass="XCBR" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="DIS" name="QB1">
+          <LNode iedName="SASSIM" ldInst="E04BCU" lnClass="CSWI" lnInst="1"/>
+        </ConductingEquipment>
+      </Bay>
+      <Bay name="E05" desc="Line-1">
+        <ConductingEquipment type="CBR" name="QA1">
+          <LNode iedName="SASSIM" ldInst="E05BCU" lnClass="XCBR" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="DIS" name="QB1">
+          <LNode iedName="SASSIM" ldInst="E05BCU" lnClass="CSWI" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="CTR" name="T1">
+          <LNode iedName="SASSIM" ldInst="E05P543" lnClass="MMXU" lnInst="1"/>
+        </ConductingEquipment>
+      </Bay>
+      <Bay name="E06" desc="Line-2">
+        <ConductingEquipment type="CBR" name="QA1">
+          <LNode iedName="SASSIM" ldInst="E06BCU" lnClass="XCBR" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="DIS" name="QB1">
+          <LNode iedName="SASSIM" ldInst="E06BCU" lnClass="CSWI" lnInst="1"/>
+        </ConductingEquipment>
+        <ConductingEquipment type="CTR" name="T1">
+          <LNode iedName="SASSIM" ldInst="E06P543" lnClass="MMXU" lnInst="1"/>
+        </ConductingEquipment>
+      </Bay>
+    </VoltageLevel>
+  </Substation>
+  <Communication>
+    <SubNetwork name="MMS_Net" type="8-MMS" desc="MMS over TCP/IP">
+      <BitRate unit="b/s" multiplier="M">100</BitRate>
+      <ConnectedAP iedName="SASSIM" apName="AP1">
+        <Address>
+          <P type="IP">10.0.0.100</P>
+          <P type="IP-SUBNET">255.255.255.0</P>
+          <P type="IP-GATEWAY">10.0.0.1</P>
+          <P type="OSI-TSEL">0001</P>
+          <P type="OSI-PSEL">00000001</P>
+          <P type="OSI-SSEL">0001</P>
+        </Address>
+        <GSE ldInst="E01BCU" cbName="gcbE01BCU">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">4</P>
+            <P type="MAC-Address">01-0C-CD-01-00-01</P>
+            <P type="APPID">1001</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+        <GSE ldInst="E02BCU" cbName="gcbE02BCU">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">4</P>
+            <P type="MAC-Address">01-0C-CD-01-00-02</P>
+            <P type="APPID">1002</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+        <GSE ldInst="E03BCU" cbName="gcbE03BCU">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">4</P>
+            <P type="MAC-Address">01-0C-CD-01-00-03</P>
+            <P type="APPID">1003</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+        <GSE ldInst="E04BCU" cbName="gcbE04BCU">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">4</P>
+            <P type="MAC-Address">01-0C-CD-01-00-04</P>
+            <P type="APPID">1004</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+        <GSE ldInst="E05BCU" cbName="gcbE05BCU">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">7</P>
+            <P type="MAC-Address">01-0C-CD-01-00-05</P>
+            <P type="APPID">1005</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+        <GSE ldInst="E06BCU" cbName="gcbE06BCU">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">7</P>
+            <P type="MAC-Address">01-0C-CD-01-00-06</P>
+            <P type="APPID">1006</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+        <GSE ldInst="E00P746Z1" cbName="gcbE00P746Z1">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">7</P>
+            <P type="MAC-Address">01-0C-CD-01-00-10</P>
+            <P type="APPID">2001</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+        <GSE ldInst="E00P746Z2" cbName="gcbE00P746Z2">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">7</P>
+            <P type="MAC-Address">01-0C-CD-01-00-11</P>
+            <P type="APPID">2002</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+        <GSE ldInst="E00P746CZ" cbName="gcbE00P746CZ">
+          <Address>
+            <P type="VLAN-ID">1</P>
+            <P type="VLAN-PRIORITY">7</P>
+            <P type="MAC-Address">01-0C-CD-01-00-12</P>
+            <P type="APPID">2003</P>
+          </Address>
+          <MinTime unit="ms">4</MinTime>
+          <MaxTime unit="ms">1000</MaxTime>
+        </GSE>
+      </ConnectedAP>
+    </SubNetwork>
+  </Communication>
+  <IED name="SASSIM" desc="GI 150kV SAS Simulator" type="SAS_Simulator" manufacturer="kVSAS_SIM" configVersion="1.0">
+    <Services>
+      <DynAssociation/>
+      <GetDirectory/>
+      <GetDataObjectDefinition/>
+      <GetDataSetValue/>
+      <SetDataSetValue/>
+      <DataSetDirectory/>
+      <ReadWrite/>
+      <GetCBValues/>
+      <GOOSE max="20"/>
+      <ConfReportControl/>
+      <FileHandling/>
+    </Services>
+    <AccessPoint name="AP1" desc="Primary Access Point">
+      <Server timeout="30">
+        <Authentication none="true"/>
+        <LDevice inst="E01BCU" desc="Transformer-1 Bay Control Unit (C264)">
+          <LN0 lnClass="LLN0" lnType="LLN0_BCU" inst="">
+            <DataSet name="SwitchStatus">
+              <FCDA ldInst="E01BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+              <FCDA ldInst="E01BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="q"/>
+              <FCDA ldInst="E01BCU" lnClass="CSWI" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+            </DataSet>
+            <ReportControl name="SwitchRCB" confRev="1" datSet="SwitchStatus" rptID="SASSIM/E01BCU/LLN0.SwitchRCB" buffered="false" intgPd="5000" bufTime="50">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="true" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="false" configRef="true" bufOvfl="false"/>
+              <RptEnabled max="5"/>
+            </ReportControl>
+            <GSEControl appID="E01BCU" name="gcbE01BCU" type="GOOSE" datSet="SwitchStatus" confRev="1"/>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-1 Bay Control Unit (C264)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="XCBR" lnType="XCBR1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>sbo-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="CSWI" lnType="CSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="XSWI" lnType="XSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="GGIO" lnType="GGIO_BCU" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+          </LN>
+        </LDevice>
+        <LDevice inst="E01P643" desc="Transformer-1 Differential Protection (P643)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="DiffTrip">
+              <FCDA ldInst="E01P643" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E01P643" lnClass="PDIF" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="DiffBRCB" confRev="1" datSet="DiffTrip" rptID="SASSIM/E01P643/LLN0.DiffBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-1 Differential Protection (P643)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PDIF" lnType="PDIF1" inst="1" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+          <LN lnClass="MMXU" lnType="MMXU1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E01P142HV" desc="Transformer-1 HV Overcurrent (P142)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="TripData">
+              <FCDA ldInst="E01P142HV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E01P142HV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="q"/>
+              <FCDA ldInst="E01P142HV" lnClass="PTOC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="TripBRCB" confRev="1" datSet="TripData" rptID="SASSIM/E01P142HV/LLN0.TripBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-1 HV Overcurrent (P142)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="2" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="3" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="4" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E01P142LV" desc="Transformer-1 LV Overcurrent (P142)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="TripData">
+              <FCDA ldInst="E01P142LV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E01P142LV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="q"/>
+              <FCDA ldInst="E01P142LV" lnClass="PTOC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="TripBRCB" confRev="1" datSet="TripData" rptID="SASSIM/E01P142LV/LLN0.TripBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-1 LV Overcurrent (P142)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="2" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="3" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="4" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E02BCU" desc="Transformer-2 Bay Control Unit (C264)">
+          <LN0 lnClass="LLN0" lnType="LLN0_BCU" inst="">
+            <DataSet name="SwitchStatus">
+              <FCDA ldInst="E02BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+              <FCDA ldInst="E02BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="q"/>
+              <FCDA ldInst="E02BCU" lnClass="CSWI" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+            </DataSet>
+            <ReportControl name="SwitchRCB" confRev="1" datSet="SwitchStatus" rptID="SASSIM/E02BCU/LLN0.SwitchRCB" buffered="false" intgPd="5000" bufTime="50">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="true" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="false" configRef="true" bufOvfl="false"/>
+              <RptEnabled max="5"/>
+            </ReportControl>
+            <GSEControl appID="E02BCU" name="gcbE02BCU" type="GOOSE" datSet="SwitchStatus" confRev="1"/>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-2 Bay Control Unit (C264)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="XCBR" lnType="XCBR1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>sbo-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="CSWI" lnType="CSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="XSWI" lnType="XSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="GGIO" lnType="GGIO_BCU" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+          </LN>
+        </LDevice>
+        <LDevice inst="E02P643" desc="Transformer-2 Differential Protection (P643)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="DiffTrip">
+              <FCDA ldInst="E02P643" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E02P643" lnClass="PDIF" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="DiffBRCB" confRev="1" datSet="DiffTrip" rptID="SASSIM/E02P643/LLN0.DiffBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-2 Differential Protection (P643)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PDIF" lnType="PDIF1" inst="1" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+          <LN lnClass="MMXU" lnType="MMXU1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E02P142HV" desc="Transformer-2 HV Overcurrent (P142)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="TripData">
+              <FCDA ldInst="E02P142HV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E02P142HV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="q"/>
+              <FCDA ldInst="E02P142HV" lnClass="PTOC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="TripBRCB" confRev="1" datSet="TripData" rptID="SASSIM/E02P142HV/LLN0.TripBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-2 HV Overcurrent (P142)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="2" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="3" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="4" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E02P142LV" desc="Transformer-2 LV Overcurrent (P142)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="TripData">
+              <FCDA ldInst="E02P142LV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E02P142LV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="q"/>
+              <FCDA ldInst="E02P142LV" lnClass="PTOC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="TripBRCB" confRev="1" datSet="TripData" rptID="SASSIM/E02P142LV/LLN0.TripBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-2 LV Overcurrent (P142)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="2" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="3" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="4" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E03BCU" desc="Transformer-3 Bay Control Unit (C264)">
+          <LN0 lnClass="LLN0" lnType="LLN0_BCU" inst="">
+            <DataSet name="SwitchStatus">
+              <FCDA ldInst="E03BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+              <FCDA ldInst="E03BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="q"/>
+              <FCDA ldInst="E03BCU" lnClass="CSWI" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+            </DataSet>
+            <ReportControl name="SwitchRCB" confRev="1" datSet="SwitchStatus" rptID="SASSIM/E03BCU/LLN0.SwitchRCB" buffered="false" intgPd="5000" bufTime="50">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="true" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="false" configRef="true" bufOvfl="false"/>
+              <RptEnabled max="5"/>
+            </ReportControl>
+            <GSEControl appID="E03BCU" name="gcbE03BCU" type="GOOSE" datSet="SwitchStatus" confRev="1"/>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-3 Bay Control Unit (C264)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="XCBR" lnType="XCBR1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>sbo-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="CSWI" lnType="CSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="XSWI" lnType="XSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="GGIO" lnType="GGIO_BCU" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+          </LN>
+        </LDevice>
+        <LDevice inst="E03P643" desc="Transformer-3 Differential Protection (P643)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="DiffTrip">
+              <FCDA ldInst="E03P643" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E03P643" lnClass="PDIF" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="DiffBRCB" confRev="1" datSet="DiffTrip" rptID="SASSIM/E03P643/LLN0.DiffBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-3 Differential Protection (P643)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PDIF" lnType="PDIF1" inst="1" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+          <LN lnClass="MMXU" lnType="MMXU1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E03P142HV" desc="Transformer-3 HV Overcurrent (P142)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="TripData">
+              <FCDA ldInst="E03P142HV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E03P142HV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="q"/>
+              <FCDA ldInst="E03P142HV" lnClass="PTOC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="TripBRCB" confRev="1" datSet="TripData" rptID="SASSIM/E03P142HV/LLN0.TripBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-3 HV Overcurrent (P142)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="2" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="3" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="4" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E03P142LV" desc="Transformer-3 LV Overcurrent (P142)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="TripData">
+              <FCDA ldInst="E03P142LV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E03P142LV" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="q"/>
+              <FCDA ldInst="E03P142LV" lnClass="PTOC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="TripBRCB" confRev="1" datSet="TripData" rptID="SASSIM/E03P142LV/LLN0.TripBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Transformer-3 LV Overcurrent (P142)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="2" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="3" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="4" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E04BCU" desc="Coupler Bay Control Unit (C264)">
+          <LN0 lnClass="LLN0" lnType="LLN0_BCU" inst="">
+            <DataSet name="SwitchStatus">
+              <FCDA ldInst="E04BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+              <FCDA ldInst="E04BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="q"/>
+              <FCDA ldInst="E04BCU" lnClass="CSWI" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+            </DataSet>
+            <ReportControl name="SwitchRCB" confRev="1" datSet="SwitchStatus" rptID="SASSIM/E04BCU/LLN0.SwitchRCB" buffered="false" intgPd="5000" bufTime="50">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="true" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="false" configRef="true" bufOvfl="false"/>
+              <RptEnabled max="5"/>
+            </ReportControl>
+            <GSEControl appID="E04BCU" name="gcbE04BCU" type="GOOSE" datSet="SwitchStatus" confRev="1"/>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Coupler Bay Control Unit (C264)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="XCBR" lnType="XCBR1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>sbo-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="CSWI" lnType="CSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="GGIO" lnType="GGIO_BCU" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+          </LN>
+        </LDevice>
+        <LDevice inst="E04P143" desc="Coupler Overcurrent Protection (P143)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="TripData">
+              <FCDA ldInst="E04P143" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E04P143" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="q"/>
+              <FCDA ldInst="E04P143" lnClass="PTOC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="TripBRCB" confRev="1" datSet="TripData" rptID="SASSIM/E04P143/LLN0.TripBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Coupler Overcurrent Protection (P143)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="2" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="3" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="4" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E05BCU" desc="Line-1 Bay Control Unit (C264)">
+          <LN0 lnClass="LLN0" lnType="LLN0_BCU" inst="">
+            <DataSet name="SwitchStatus">
+              <FCDA ldInst="E05BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+              <FCDA ldInst="E05BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="q"/>
+              <FCDA ldInst="E05BCU" lnClass="CSWI" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+            </DataSet>
+            <ReportControl name="SwitchRCB" confRev="1" datSet="SwitchStatus" rptID="SASSIM/E05BCU/LLN0.SwitchRCB" buffered="false" intgPd="5000" bufTime="50">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="true" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="false" configRef="true" bufOvfl="false"/>
+              <RptEnabled max="5"/>
+            </ReportControl>
+            <GSEControl appID="E05BCU" name="gcbE05BCU" type="GOOSE" datSet="SwitchStatus" confRev="1"/>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Line-1 Bay Control Unit (C264)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="XCBR" lnType="XCBR1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>sbo-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="CSWI" lnType="CSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="XSWI" lnType="XSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="GGIO" lnType="GGIO_BCU" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+          </LN>
+        </LDevice>
+        <LDevice inst="E05P142" desc="Line-1 Backup Overcurrent (P142)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="TripData">
+              <FCDA ldInst="E05P142" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E05P142" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="q"/>
+              <FCDA ldInst="E05P142" lnClass="PTOC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="TripBRCB" confRev="1" datSet="TripData" rptID="SASSIM/E05P142/LLN0.TripBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Line-1 Backup Overcurrent (P142)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="2" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="3" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="4" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E05P543" desc="Line-1 Distance + Auto-Reclose (P543)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="DistTrip">
+              <FCDA ldInst="E05P543" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E05P543" lnClass="PDIS" fc="ST" lnInst="1" doName="Op" daName="general"/>
+              <FCDA ldInst="E05P543" lnClass="PDIS" fc="ST" lnInst="2" doName="Op" daName="general"/>
+              <FCDA ldInst="E05P543" lnClass="PDIS" fc="ST" lnInst="3" doName="Op" daName="general"/>
+              <FCDA ldInst="E05P543" lnClass="PDIS" fc="ST" lnInst="4" doName="Op" daName="general"/>
+              <FCDA ldInst="E05P543" lnClass="RREC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="DistBRCB" confRev="1" datSet="DistTrip" rptID="SASSIM/E05P543/LLN0.DistBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Line-1 Distance + Auto-Reclose (P543)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PDIS" lnType="PDIS1" inst="1" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>Zone 1 Distance Protection</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="PDIS" lnType="PDIS1" inst="2" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>Zone 2 Distance Protection</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="PDIS" lnType="PDIS1" inst="3" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>Zone 3 Distance Protection</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="PDIS" lnType="PDIS1" inst="4" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>Zone 4 Distance Protection</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+          <LN lnClass="RREC" lnType="RREC1" inst="1" prefix=""/>
+          <LN lnClass="RSYN" lnType="RSYN1" inst="1" prefix=""/>
+          <LN lnClass="MMXU" lnType="MMXU1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E06BCU" desc="Line-2 Bay Control Unit (C264)">
+          <LN0 lnClass="LLN0" lnType="LLN0_BCU" inst="">
+            <DataSet name="SwitchStatus">
+              <FCDA ldInst="E06BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+              <FCDA ldInst="E06BCU" lnClass="XCBR" fc="ST" lnInst="1" doName="Pos" daName="q"/>
+              <FCDA ldInst="E06BCU" lnClass="CSWI" fc="ST" lnInst="1" doName="Pos" daName="stVal"/>
+            </DataSet>
+            <ReportControl name="SwitchRCB" confRev="1" datSet="SwitchStatus" rptID="SASSIM/E06BCU/LLN0.SwitchRCB" buffered="false" intgPd="5000" bufTime="50">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="true" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="false" configRef="true" bufOvfl="false"/>
+              <RptEnabled max="5"/>
+            </ReportControl>
+            <GSEControl appID="E06BCU" name="gcbE06BCU" type="GOOSE" datSet="SwitchStatus" confRev="1"/>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Line-2 Bay Control Unit (C264)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="XCBR" lnType="XCBR1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>sbo-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="CSWI" lnType="CSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="XSWI" lnType="XSWI1" inst="1" prefix="">
+            <DOI name="Pos">
+              <DAI name="ctlModel">
+                <Val>direct-with-normal-security</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="GGIO" lnType="GGIO_BCU" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+          </LN>
+        </LDevice>
+        <LDevice inst="E06P142" desc="Line-2 Backup Overcurrent (P142)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="TripData">
+              <FCDA ldInst="E06P142" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E06P142" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="q"/>
+              <FCDA ldInst="E06P142" lnClass="PTOC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="TripBRCB" confRev="1" datSet="TripData" rptID="SASSIM/E06P142/LLN0.TripBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Line-2 Backup Overcurrent (P142)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="1" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="2" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="3" prefix=""/>
+          <LN lnClass="PTOC" lnType="PTOC1" inst="4" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E06P543" desc="Line-2 Distance + Auto-Reclose (P543)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="DistTrip">
+              <FCDA ldInst="E06P543" lnClass="PTRC" fc="ST" lnInst="1" doName="Tr" daName="general"/>
+              <FCDA ldInst="E06P543" lnClass="PDIS" fc="ST" lnInst="1" doName="Op" daName="general"/>
+              <FCDA ldInst="E06P543" lnClass="PDIS" fc="ST" lnInst="2" doName="Op" daName="general"/>
+              <FCDA ldInst="E06P543" lnClass="PDIS" fc="ST" lnInst="3" doName="Op" daName="general"/>
+              <FCDA ldInst="E06P543" lnClass="PDIS" fc="ST" lnInst="4" doName="Op" daName="general"/>
+              <FCDA ldInst="E06P543" lnClass="RREC" fc="ST" lnInst="1" doName="Op" daName="general"/>
+            </DataSet>
+            <ReportControl name="DistBRCB" confRev="1" datSet="DistTrip" rptID="SASSIM/E06P543/LLN0.DistBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Line-2 Distance + Auto-Reclose (P543)</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PDIS" lnType="PDIS1" inst="1" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>Zone 1 Distance Protection</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="PDIS" lnType="PDIS1" inst="2" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>Zone 2 Distance Protection</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="PDIS" lnType="PDIS1" inst="3" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>Zone 3 Distance Protection</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="PDIS" lnType="PDIS1" inst="4" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>Zone 4 Distance Protection</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+          <LN lnClass="RREC" lnType="RREC1" inst="1" prefix=""/>
+          <LN lnClass="RSYN" lnType="RSYN1" inst="1" prefix=""/>
+          <LN lnClass="MMXU" lnType="MMXU1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E00P746Z1" desc="Busbar Protection Zone 1 (P746)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="BBTrip">
+              <FCDA ldInst="E00P746Z1" lnClass="PDIF" fc="ST" lnInst="1" doName="Op" daName="general"/>
+              <FCDA ldInst="E00P746Z1" lnClass="RBRF" fc="ST" lnInst="1" doName="OpEx" daName="general"/>
+            </DataSet>
+            <ReportControl name="BBRCB" confRev="1" datSet="BBTrip" rptID="SASSIM/E00P746Z1/LLN0.BBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <GSEControl appID="E00P746Z1" name="gcbE00P746Z1" type="GOOSE" datSet="BBTrip" confRev="1"/>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Busbar Protection Zone 1</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PDIF" lnType="PDIF_BB" inst="1" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>87B Zone 1</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="RBRF" lnType="RBRF1" inst="1" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E00P746Z2" desc="Busbar Protection Zone 2 (P746)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="BBTrip">
+              <FCDA ldInst="E00P746Z2" lnClass="PDIF" fc="ST" lnInst="1" doName="Op" daName="general"/>
+              <FCDA ldInst="E00P746Z2" lnClass="RBRF" fc="ST" lnInst="1" doName="OpEx" daName="general"/>
+            </DataSet>
+            <ReportControl name="BBRCB" confRev="1" datSet="BBTrip" rptID="SASSIM/E00P746Z2/LLN0.BBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <GSEControl appID="E00P746Z2" name="gcbE00P746Z2" type="GOOSE" datSet="BBTrip" confRev="1"/>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Busbar Protection Zone 2</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PDIF" lnType="PDIF_BB" inst="1" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>87B Zone 2</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="RBRF" lnType="RBRF1" inst="1" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E00P746CZ" desc="Busbar Protection Check Zone (P746)">
+          <LN0 lnClass="LLN0" lnType="LLN0_PROT" inst="">
+            <DataSet name="BBTrip">
+              <FCDA ldInst="E00P746CZ" lnClass="PDIF" fc="ST" lnInst="1" doName="Op" daName="general"/>
+              <FCDA ldInst="E00P746CZ" lnClass="RBRF" fc="ST" lnInst="1" doName="OpEx" daName="general"/>
+            </DataSet>
+            <ReportControl name="BBRCB" confRev="1" datSet="BBTrip" rptID="SASSIM/E00P746CZ/LLN0.BBRCB" buffered="true" intgPd="0" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="false" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="true" entryID="true" configRef="true" bufOvfl="true"/>
+              <RptEnabled max="2"/>
+            </ReportControl>
+            <GSEControl appID="E00P746CZ" name="gcbE00P746CZ" type="GOOSE" datSet="BBTrip" confRev="1"/>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Busbar Protection Check Zone</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="PDIF" lnType="PDIF_BB" inst="1" prefix="">
+            <DOI name="Op">
+              <DAI name="d">
+                <Val>87B Check Zone</Val>
+              </DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="RBRF" lnType="RBRF1" inst="1" prefix=""/>
+          <LN lnClass="PTRC" lnType="PTRC1" inst="1" prefix=""/>
+        </LDevice>
+        <LDevice inst="E00IO" desc="Common IED I/O (C264)">
+          <LN0 lnClass="LLN0" lnType="LLN0_BCU" inst="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Common I/O Panel</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="GGIO" lnType="GGIO_IO" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+          </LN>
+        </LDevice>
+        <LDevice inst="E00MEAS" desc="Energy Metering (ION 8650)">
+          <LN0 lnClass="LLN0" lnType="LLN0_MEAS" inst="">
+            <DataSet name="MeasData">
+              <FCDA ldInst="E00MEAS" lnClass="MMXU" fc="MX" lnInst="1" doName="TotW"/>
+              <FCDA ldInst="E00MEAS" lnClass="MMXU" fc="MX" lnInst="1" doName="TotVAr"/>
+              <FCDA ldInst="E00MEAS" lnClass="MMXU" fc="MX" lnInst="1" doName="Hz"/>
+            </DataSet>
+            <ReportControl name="MeasRCB" confRev="1" datSet="MeasData" rptID="SASSIM/E00MEAS/LLN0.MeasRCB" buffered="false" intgPd="5000" bufTime="0">
+              <TrgOps dchg="true" qchg="true" dupd="false" period="true" gi="true"/>
+              <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" dataRef="false" entryID="false" configRef="true" bufOvfl="false"/>
+              <RptEnabled max="5"/>
+            </ReportControl>
+            <DOI name="Mod">
+              <DAI name="ctlModel">
+                <Val>status-only</Val>
+              </DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor">
+                <Val>kVSAS_SIM</Val>
+              </DAI>
+              <DAI name="swRev">
+                <Val>1.0.0</Val>
+              </DAI>
+              <DAI name="d">
+                <Val>Energy Metering Panel</Val>
+              </DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix=""/>
+          <LN lnClass="MMXU" lnType="MMXU1" inst="1" prefix=""/>
+        </LDevice>
+      </Server>
+    </AccessPoint>
+  </IED>
+  <DataTypeTemplates>
+    <LNodeType id="LLN0_BCU" lnClass="LLN0">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+    </LNodeType>
+    <LNodeType id="LLN0_PROT" lnClass="LLN0">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+    </LNodeType>
+    <LNodeType id="LLN0_MEAS" lnClass="LLN0">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+    </LNodeType>
+    <LNodeType id="LPHD1" lnClass="LPHD">
+      <DO name="PhyNam" type="DPL1"/>
+      <DO name="PhyHealth" type="INS1"/>
+      <DO name="Proxy" type="SPS1"/>
+    </LNodeType>
+    <LNodeType id="XCBR1" lnClass="XCBR">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Pos" type="DPC1"/>
+      <DO name="BlkOpn" type="SPC1"/>
+      <DO name="BlkCls" type="SPC1"/>
+      <DO name="CBOpCap" type="INS1"/>
+    </LNodeType>
+    <LNodeType id="CSWI1" lnClass="CSWI">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Pos" type="DPC1"/>
+    </LNodeType>
+    <LNodeType id="XSWI1" lnClass="XSWI">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Pos" type="DPC1"/>
+    </LNodeType>
+    <LNodeType id="GGIO_BCU" lnClass="GGIO">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Ind1" type="SPS1"/>
+      <DO name="Ind2" type="SPS1"/>
+      <DO name="Ind3" type="SPS1"/>
+      <DO name="Ind4" type="SPS1"/>
+      <DO name="SPCSO1" type="SPC1"/>
+      <DO name="SPCSO2" type="SPC1"/>
+    </LNodeType>
+    <LNodeType id="GGIO_IO" lnClass="GGIO">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Ind1" type="SPS1"/>
+      <DO name="Ind2" type="SPS1"/>
+      <DO name="Ind3" type="SPS1"/>
+      <DO name="Ind4" type="SPS1"/>
+      <DO name="AnIn1" type="MV1"/>
+      <DO name="AnIn2" type="MV1"/>
+      <DO name="AnIn3" type="MV1"/>
+      <DO name="AnIn4" type="MV1"/>
+    </LNodeType>
+    <LNodeType id="PTOC1" lnClass="PTOC">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Op" type="ACT1"/>
+      <DO name="Str" type="ACD1"/>
+    </LNodeType>
+    <LNodeType id="PDIS1" lnClass="PDIS">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Op" type="ACT1"/>
+      <DO name="Str" type="ACD1"/>
+    </LNodeType>
+    <LNodeType id="PDIF1" lnClass="PDIF">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Op" type="ACT1"/>
+      <DO name="Str" type="ACD1"/>
+    </LNodeType>
+    <LNodeType id="PDIF_BB" lnClass="PDIF">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Op" type="ACT1"/>
+    </LNodeType>
+    <LNodeType id="PTRC1" lnClass="PTRC">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Tr" type="ACT1"/>
+    </LNodeType>
+    <LNodeType id="RREC1" lnClass="RREC">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="Op" type="ACT1"/>
+      <DO name="AutoRecSt" type="INS1"/>
+    </LNodeType>
+    <LNodeType id="RSYN1" lnClass="RSYN">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="RsSyn" type="SPS1"/>
+    </LNodeType>
+    <LNodeType id="RBRF1" lnClass="RBRF">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="OpEx" type="ACT1"/>
+      <DO name="FailMod" type="INS1"/>
+    </LNodeType>
+    <LNodeType id="MMXU1" lnClass="MMXU">
+      <DO name="Mod" type="INC1"/>
+      <DO name="Beh" type="INS1"/>
+      <DO name="Health" type="INS1"/>
+      <DO name="NamPlt" type="LPL1"/>
+      <DO name="TotW" type="MV1"/>
+      <DO name="TotVAr" type="MV1"/>
+      <DO name="TotVA" type="MV1"/>
+      <DO name="Hz" type="MV1"/>
+      <DO name="PhV" type="WYE1"/>
+      <DO name="A" type="WYE1"/>
+    </LNodeType>
+    <DOType id="INC1" cdc="INC">
+      <DA name="stVal" bType="INT32" fc="ST"/>
+      <DA name="q" bType="Quality" fc="ST"/>
+      <DA name="t" bType="Timestamp" fc="ST"/>
+      <DA name="ctlModel" bType="Enum" fc="CF" type="CtlModels"/>
+    </DOType>
+    <DOType id="INS1" cdc="INS">
+      <DA name="stVal" bType="INT32" fc="ST"/>
+      <DA name="q" bType="Quality" fc="ST"/>
+      <DA name="t" bType="Timestamp" fc="ST"/>
+    </DOType>
+    <DOType id="SPS1" cdc="SPS">
+      <DA name="stVal" bType="BOOLEAN" fc="ST"/>
+      <DA name="q" bType="Quality" fc="ST"/>
+      <DA name="t" bType="Timestamp" fc="ST"/>
+      <DA name="d" bType="VisString255" fc="DC"/>
+    </DOType>
+    <DOType id="SPC1" cdc="SPC">
+      <DA name="stVal" bType="BOOLEAN" fc="ST"/>
+      <DA name="q" bType="Quality" fc="ST"/>
+      <DA name="t" bType="Timestamp" fc="ST"/>
+      <DA name="ctlModel" bType="Enum" fc="CF" type="CtlModels"/>
+      <DA name="Oper" bType="Struct" fc="CO" type="SPCOperate"/>
+      <DA name="d" bType="VisString255" fc="DC"/>
+    </DOType>
+    <DOType id="DPC1" cdc="DPC">
+      <DA name="stVal" bType="Dbpos" fc="ST"/>
+      <DA name="q" bType="Quality" fc="ST"/>
+      <DA name="t" bType="Timestamp" fc="ST"/>
+      <DA name="ctlModel" bType="Enum" fc="CF" type="CtlModels"/>
+      <DA name="Oper" bType="Struct" fc="CO" type="DPCOperate"/>
+      <DA name="d" bType="VisString255" fc="DC"/>
+    </DOType>
+    <DOType id="MV1" cdc="MV">
+      <DA name="mag" bType="Struct" fc="MX" type="AnalogueValue"/>
+      <DA name="q" bType="Quality" fc="MX"/>
+      <DA name="t" bType="Timestamp" fc="MX"/>
+      <DA name="d" bType="VisString255" fc="DC"/>
+    </DOType>
+    <DOType id="WYE1" cdc="WYE">
+      <DA name="phsA" bType="Struct" fc="MX" type="CMV1"/>
+      <DA name="phsB" bType="Struct" fc="MX" type="CMV1"/>
+      <DA name="phsC" bType="Struct" fc="MX" type="CMV1"/>
+      <DA name="d" bType="VisString255" fc="DC"/>
+    </DOType>
+    <DOType id="ACT1" cdc="ACT">
+      <DA name="general" bType="BOOLEAN" fc="ST"/>
+      <DA name="q" bType="Quality" fc="ST"/>
+      <DA name="t" bType="Timestamp" fc="ST"/>
+      <DA name="d" bType="VisString255" fc="DC"/>
+    </DOType>
+    <DOType id="ACD1" cdc="ACD">
+      <DA name="general" bType="BOOLEAN" fc="ST"/>
+      <DA name="dirGeneral" bType="Enum" fc="ST" type="FaultDirection"/>
+      <DA name="q" bType="Quality" fc="ST"/>
+      <DA name="t" bType="Timestamp" fc="ST"/>
+      <DA name="d" bType="VisString255" fc="DC"/>
+    </DOType>
+    <DOType id="LPL1" cdc="LPL">
+      <DA name="vendor" bType="VisString255" fc="DC"/>
+      <DA name="swRev" bType="VisString255" fc="DC"/>
+      <DA name="d" bType="VisString255" fc="DC"/>
+      <DA name="configRev" bType="VisString255" fc="DC"/>
+      <DA name="ldNs" bType="VisString255" fc="EX"/>
+    </DOType>
+    <DOType id="DPL1" cdc="DPL">
+      <DA name="vendor" bType="VisString255" fc="DC"/>
+      <DA name="hwRev" bType="VisString255" fc="DC"/>
+      <DA name="swRev" bType="VisString255" fc="DC"/>
+      <DA name="serNum" bType="VisString255" fc="DC"/>
+      <DA name="model" bType="VisString255" fc="DC"/>
+    </DOType>
+    <DAType id="AnalogueValue">
+      <BDA name="f" bType="FLOAT32"/>
+    </DAType>
+    <DAType id="CMV1">
+      <BDA name="cVal" bType="Struct" type="Vector1"/>
+      <BDA name="q" bType="Quality"/>
+      <BDA name="t" bType="Timestamp"/>
+    </DAType>
+    <DAType id="Vector1">
+      <BDA name="mag" bType="Struct" type="AnalogueValue"/>
+      <BDA name="ang" bType="Struct" type="AnalogueValue"/>
+    </DAType>
+    <DAType id="SPCOperate">
+      <BDA name="ctlVal" bType="BOOLEAN"/>
+      <BDA name="origin" bType="Struct" type="Originator1"/>
+      <BDA name="ctlNum" bType="INT8U"/>
+      <BDA name="T" bType="Timestamp"/>
+      <BDA name="Test" bType="BOOLEAN"/>
+      <BDA name="Check" bType="Check"/>
+    </DAType>
+    <DAType id="DPCOperate">
+      <BDA name="ctlVal" bType="BOOLEAN"/>
+      <BDA name="origin" bType="Struct" type="Originator1"/>
+      <BDA name="ctlNum" bType="INT8U"/>
+      <BDA name="T" bType="Timestamp"/>
+      <BDA name="Test" bType="BOOLEAN"/>
+      <BDA name="Check" bType="Check"/>
+    </DAType>
+    <DAType id="Originator1">
+      <BDA name="orCat" bType="Enum" type="OrCat"/>
+      <BDA name="orIdent" bType="Octet64"/>
+    </DAType>
+    <EnumType id="CtlModels">
+      <EnumVal ord="0">status-only</EnumVal>
+      <EnumVal ord="1">direct-with-normal-security</EnumVal>
+      <EnumVal ord="2">sbo-with-normal-security</EnumVal>
+      <EnumVal ord="3">direct-with-enhanced-security</EnumVal>
+      <EnumVal ord="4">sbo-with-enhanced-security</EnumVal>
+    </EnumType>
+    <EnumType id="BehaviourMode">
+      <EnumVal ord="0">on</EnumVal>
+      <EnumVal ord="1">blocked</EnumVal>
+      <EnumVal ord="2">test</EnumVal>
+      <EnumVal ord="3">test/blocked</EnumVal>
+      <EnumVal ord="4">off</EnumVal>
+    </EnumType>
+    <EnumType id="HealthKind">
+      <EnumVal ord="0">ok</EnumVal>
+      <EnumVal ord="1">warning</EnumVal>
+      <EnumVal ord="2">alarm</EnumVal>
+    </EnumType>
+    <EnumType id="FaultDirection">
+      <EnumVal ord="0">unknown</EnumVal>
+      <EnumVal ord="1">forward</EnumVal>
+      <EnumVal ord="2">backward</EnumVal>
+      <EnumVal ord="3">both</EnumVal>
+    </EnumType>
+    <EnumType id="OrCat">
+      <EnumVal ord="0">not-supported</EnumVal>
+      <EnumVal ord="1">bay-control</EnumVal>
+      <EnumVal ord="2">station-control</EnumVal>
+      <EnumVal ord="3">remote-control</EnumVal>
+      <EnumVal ord="4">automatic-bay</EnumVal>
+      <EnumVal ord="5">automatic-station</EnumVal>
+      <EnumVal ord="6">automatic-remote</EnumVal>
+      <EnumVal ord="7">maintenance</EnumVal>
+      <EnumVal ord="8">process</EnumVal>
+    </EnumType>
+  </DataTypeTemplates>
+</SCL>

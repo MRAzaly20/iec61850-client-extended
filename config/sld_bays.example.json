@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "defaults": { "host": "127.0.0.1", "connect_timeout_ms": 500 },
+  "note": "Matches goose-v2.1 sas_server/config/*/config/*.json ip:port. CID 10.0.x.x is documentary only.",
+  "bays": [
+    { "bay_index": 0, "bay_id": "E01", "label": "E01 TRF-1", "ied_name": "E01_BCU", "ld_inst": "E01BCU", "host": "127.0.0.1", "port": 10201, "rcb": "E01_BCU/E01BCU/LLN0.SwitchRCB", "enabled": true },
+    { "bay_index": 1, "bay_id": "E02", "label": "E02 TRF-2", "ied_name": "E02_BCU", "ld_inst": "E02BCU", "host": "127.0.0.1", "port": 10202, "rcb": "E02_BCU/E02BCU/LLN0.SwitchRCB", "enabled": true },
+    { "bay_index": 2, "bay_id": "E03", "label": "E03 TRF-3", "ied_name": "E03_BCU", "ld_inst": "E03BCU", "host": "127.0.0.1", "port": 10203, "rcb": "E03_BCU/E03BCU/LLN0.SwitchRCB", "enabled": true },
+    { "bay_index": 3, "bay_id": "E04", "label": "E04 COUPLER", "ied_name": "E04_BCU", "ld_inst": "E04BCU", "host": "127.0.0.1", "port": 10204, "rcb": "E04_BCU/E04BCU/LLN0.SwitchRCB", "enabled": true },
+    { "bay_index": 4, "bay_id": "E05", "label": "E05 LINE-1", "ied_name": "E05_BCU", "ld_inst": "E05BCU", "host": "127.0.0.1", "port": 10205, "rcb": "E05_BCU/E05BCU/LLN0.SwitchRCB", "enabled": true },
+    { "bay_index": 5, "bay_id": "E06", "label": "E06 LINE-2", "ied_name": "E06_BCU", "ld_inst": "E06BCU", "host": "127.0.0.1", "port": 10206, "rcb": "E06_BCU/E06BCU/LLN0.SwitchRCB", "enabled": true }
+  ]
+}

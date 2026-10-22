@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "note": "Mirrors sld_draw.c:74-85 + CID LNs. E04 has no XSWI3/4. E01-E03 have no XSWI4 in CID (validator must flag default ES).",
+  "equipment_templates": {
+    "CB": { "ln_class": "XCBR", "do": "Pos", "cdc": "DPC", "fc_read": "ST", "fc_ctrl": "CO" },
+    "DS": { "ln_class": "XSWI", "do": "Pos", "cdc": "DPC", "fc_read": "ST", "fc_ctrl": "CO" },
+    "ES": { "ln_class": "XSWI", "do": "Pos", "cdc": "DPC", "fc_read": "ST", "fc_ctrl": "CO" }
+  },
+  "bays": [
+    {
+      "bay_id": "E01",
+      "equipment": [
+        { "key": "DS-A", "type": "DS_BUS", "ln": "XSWI1", "label": "DS-A" },
+        { "key": "DS-B", "type": "DS_BUS", "ln": "XSWI2", "label": "DS-B" },
+        { "key": "CB1", "type": "CB", "ln": "XCBR1", "label": "CB1" },
+        { "key": "DSL", "type": "DS_LINE", "ln": "XSWI3", "label": "Line DS" }
+      ]
+    },
+    {
+      "bay_id": "E04",
+      "equipment": [
+        { "key": "DS-A", "type": "DS_BUS", "ln": "XSWI1", "label": "DS-A" },
+        { "key": "DS-B", "type": "DS_BUS", "ln": "XSWI2", "label": "DS-B" },
+        { "key": "CB1", "type": "CB", "ln": "XCBR1", "label": "CB1" }
+      ]
+    },
+    {
+      "bay_id": "E05",
+      "equipment": [
+        { "key": "DS-A", "type": "DS_BUS", "ln": "XSWI1", "label": "DS-A" },
+        { "key": "DS-B", "type": "DS_BUS", "ln": "XSWI2", "label": "DS-B" },
+        { "key": "CB1", "type": "CB", "ln": "XCBR1", "label": "CB1" },
+        { "key": "DSL", "type": "DS_LINE", "ln": "XSWI3", "label": "Line DS" },
+        { "key": "ES", "type": "EARTH", "ln": "XSWI4", "label": "ES" }
+      ]
+    }
+  ]
+}

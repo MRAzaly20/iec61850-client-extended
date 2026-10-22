@@ -1,0 +1,283 @@
+/* ============================================================
+ *  IEC 61850 Client — Cyber-Industrial Dark Theme
+ *  Full dark mode — no white backgrounds anywhere
+ * ============================================================ */
+
+/* --- Force dark everywhere --- */
+* {
+    -gtk-icon-filter: none;
+}
+
+window, window.background, .background {
+    background-color: #0a0e14;
+    color: #c5c8c6;
+    font-family: "Segoe UI", "Inter", sans-serif;
+    font-size: 13px;
+}
+
+/* --- Toolbar & Headerbar --- */
+headerbar, .titlebar, window > headerbar, window > titlebar {
+    background-color: #111820;
+    background-image: none;
+    color: #c5c8c6;
+    border-bottom: 1px solid #0ff3;
+}
+
+.toolbar {
+    background-color: #111820;
+    border-bottom: 1px solid #0ff3;
+}
+
+/* --- Buttons --- */
+button {
+    background-image: none;
+    background-color: #161e28;
+    color: #00d4ff;
+    border: 1px solid #00d4ff44;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-weight: 600;
+    box-shadow: none;
+    text-shadow: none;
+}
+button:hover {
+    background-image: none;
+    background-color: #00d4ff18;
+    border-color: #00d4ff;
+    box-shadow: 0 0 6px #00d4ff44;
+}
+button:active {
+    background-image: none;
+    background-color: #00d4ff33;
+}
+button.destructive-action {
+    background-image: none;
+    border-color: #ff4444aa; color: #ff6666;
+}
+button.destructive-action:hover {
+    background-image: none;
+    background-color: #ff444418;
+    border-color: #ff4444;
+    box-shadow: 0 0 6px #ff444444;
+}
+.action-btn {
+    color: #b0c0d0;
+    border-color: #334;
+}
+.action-btn:hover {
+    color: #00d4ff;
+    border-color: #00d4ff66;
+}
+
+/* --- Entries --- */
+entry {
+    background-color: #111820;
+    background-image: none;
+    color: #e0e0e0;
+    border: 1px solid #0ff2;
+    border-radius: 3px;
+    padding: 3px 8px;
+    caret-color: #00d4ff;
+    box-shadow: none;
+}
+entry:focus {
+    border-color: #00d4ff;
+    box-shadow: 0 0 4px #00d4ff33;
+    background-image: none;
+}
+
+/* --- General overrides to kill white backgrounds --- */
+box, frame, scrolledwindow, viewport, paned {
+    background-color: transparent;
+}
+
+/* --- Pane titles --- */
+.pane-title {
+    background-color: #111820;
+    color: #66ccff;
+    font-weight: 700;
+    font-size: 0.9em;
+    padding: 6px 8px;
+    border-bottom: 1px solid #0ff2;
+    letter-spacing: 0.5px;
+}
+
+/* --- Explorer pane (left) --- */
+.explorer-pane {
+    background-color: #0d1117;
+    border-right: 1px solid #0ff2;
+}
+.explorer-tree {
+    background-color: #0d1117;
+    color: #c5c8c6;
+}
+.tree-ld { color: #ffcc00; font-weight: 700; }
+.tree-ln { color: #66ccff; }
+
+/* --- Data pane (right) --- */
+.data-pane {
+    background-color: #0d1117;
+}
+.breadcrumb {
+    background-color: #111820;
+    color: #8ba0b8;
+    font-size: 0.85em;
+    padding: 5px 8px;
+    border-bottom: 1px solid #0ff1;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+}
+
+/* --- ListView / ColumnView — universal dark --- */
+listview, columnview {
+    background-color: #0d1117;
+    color: #c5c8c6;
+}
+listview > row, columnview listview > row {
+    background-color: transparent;
+    color: #c5c8c6;
+    padding: 1px 4px;
+    border-bottom: 1px solid #ffffff06;
+}
+listview > row:hover, columnview listview > row:hover {
+    background-color: #00d4ff0d;
+}
+listview > row:selected, columnview listview > row:selected {
+    background-color: #00d4ff22;
+}
+listview > row cell, columnview listview > row cell {
+    background-color: transparent;
+}
+
+/* --- ColumnView header --- */
+columnview > header > button {
+    background-image: none;
+    background-color: #111820;
+    color: #66ccff;
+    border-bottom: 2px solid #0ff3;
+    border-radius: 0;
+    font-weight: 700;
+    font-size: 0.82em;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    box-shadow: none;
+}
+
+/* --- Tree expander arrow override --- */
+treeexpander {
+    background-color: transparent;
+    color: #c5c8c6;
+}
+treeexpander > image {
+    color: #555e6a;
+}
+treeexpander:checked > image {
+    color: #00d4ff;
+}
+
+/* --- Column data styles --- */
+.col-value {
+    color: #50fa7b;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 0.9em;
+}
+.col-type  { color: #ff79c6; }
+.col-mms   { color: #8be9fd; font-size: 0.88em; }
+.col-time  { color: #6a737d; font-size: 0.85em; font-family: "JetBrains Mono", "Consolas", monospace; }
+.col-desc  { color: #7a8899; font-size: 0.88em; }
+
+/* ---- Badges ---- */
+.badge {
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 0.75em;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    min-width: 22px;
+}
+
+/* Object type badges */
+.badge-do {
+    background-color: #ffcc0033;
+    color: #ffcc00;
+    border: 1px solid #ffcc0066;
+}
+.badge-da {
+    background-color: #50fa7b22;
+    color: #50fa7b;
+    border: 1px solid #50fa7b44;
+}
+
+/* Functional constraint badges */
+.badge-mx {
+    background-color: #00d4ff22;
+    color: #00d4ff;
+    border: 1px solid #00d4ff44;
+}
+.badge-st {
+    background-color: #0ff2;
+    color: #0ff;
+    border: 1px solid #0ff4;
+}
+.badge-cf {
+    background-color: #bd93f922;
+    color: #bd93f9;
+    border: 1px solid #bd93f944;
+}
+.badge-co {
+    background-color: #ff555522;
+    color: #ff5555;
+    border: 1px solid #ff555544;
+}
+.badge-dc {
+    background-color: #f1fa8c22;
+    color: #f1fa8c;
+    border: 1px solid #f1fa8c44;
+}
+.badge-fc {
+    background-color: #44475a;
+    color: #a0a8b8;
+    border: 1px solid #55586a;
+}
+
+/* --- Status bar --- */
+.status-bar {
+    background-color: #111820;
+    border-top: 1px solid #0ff2;
+    padding: 4px 10px;
+    font-size: 0.85em;
+}
+.status-connected   { color: #50fa7b; }
+.status-disconnected { color: #ff5555; }
+.status-info         { color: #ffcc00; }
+
+/* --- Scrollbars --- */
+scrollbar {
+    background-color: #0d1117;
+}
+scrollbar trough {
+    background-color: #0d1117;
+}
+scrollbar slider {
+    background-color: #00d4ff44;
+    border-radius: 4px;
+    min-width: 6px; min-height: 6px;
+}
+scrollbar slider:hover { background-color: #00d4ff88; }
+
+/* --- Separator --- */
+separator { background-color: #0ff2; min-height: 1px; }
+
+/* --- Paned handle --- */
+paned > separator {
+    background-color: #0ff1;
+    min-width: 3px;
+}
+paned > separator:hover {
+    background-color: #00d4ff44;
+}
+
+/* --- GtkImage in buttons/tree icons --- */
+image {
+    color: #8ba0b8;
+}
