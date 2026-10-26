@@ -6,7 +6,7 @@
 			"ied_name":	"BT18_BC1",
 			"ld_inst":	"CONTROL",
 			"host":	"10.127.23.108",
-			"port":	10202,
+			"port":	10201,
 			"rcb_ref":	"",
 			"ln_cb":	"CSWI3",
 			"ln_ds_a":	"CSWI2",

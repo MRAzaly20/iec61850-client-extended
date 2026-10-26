@@ -178,6 +178,11 @@ void populate_data_view(AppState *app, IedModelNode *ln_node) {
 
     if (!ln_node) return;
 
+    /* Discover child DOs and DAs on demand if not yet discovered */
+    if (ln_node->children->len == 0 && app->explorer_connected && app->explorer_con) {
+        discover_ln_children(app->explorer_con, ln_node);
+    }
+
     /* Update breadcrumb */
     char path[512];
     snprintf(path, sizeof(path), "  %s", ln_node->ref);
@@ -233,6 +238,67 @@ on_tree_selection_changed(GtkSelectionModel *sel, guint pos, guint n, gpointer u
 /*  Signal handlers                                                   */
 /* ================================================================== */
 
+static void
+on_connect_finish(GObject *source, GAsyncResult *res, gpointer user_data)
+{
+    (void)source;
+    AppState *app = (AppState *)user_data;
+    ConnectTaskData *cd = (ConnectTaskData *)g_task_get_task_data(G_TASK(res));
+
+    gtk_widget_set_sensitive(app->connect_btn, TRUE);
+
+    if (cd && cd->success && app->explorer_connected) {
+        IedModelNode *model = cd->model;
+
+        if (!app->ui_model_root) {
+            app->ui_model_root = ied_model_node_new("IED", "", NODE_ROOT);
+        } else {
+            g_ptr_array_set_size(app->ui_model_root->children, 0);
+        }
+
+        if (model && model->children->len > 0) {
+            for (guint c = 0; c < model->children->len; c++) {
+                IedModelNode *ld = g_ptr_array_index(model->children, c);
+                g_ptr_array_add(app->ui_model_root->children, ld);
+            }
+            g_free(model->name);
+            g_free(model->ref);
+            g_ptr_array_free(model->children, FALSE);
+            g_free(model);
+        } else if (model) {
+            ied_model_node_free(model);
+        }
+
+        gtk_button_set_label(GTK_BUTTON(app->connect_btn), "  Disconnect");
+        gtk_widget_add_css_class(app->connect_btn, "destructive-action");
+
+        populate_tree_view(app);
+
+        /* Auto-select first LN of first LD if available */
+        if (app->ui_model_root && app->ui_model_root->children->len > 0) {
+            IedModelNode *first_ld = g_ptr_array_index(app->ui_model_root->children, 0);
+            if (first_ld->children->len > 0) {
+                IedModelNode *first_ln = g_ptr_array_index(first_ld->children, 0);
+                populate_data_view(app, first_ln);
+            }
+        }
+
+        /* Automatically enable auto poll upon successful connection */
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->auto_poll_btn), TRUE);
+
+        char msg[256];
+        snprintf(msg, sizeof(msg), "  Connected to %s:%d", cd->host, cd->port);
+        set_status(app, msg, "status-connected");
+    } else {
+        gtk_button_set_label(GTK_BUTTON(app->connect_btn), "  Connect");
+        gtk_widget_remove_css_class(app->connect_btn, "destructive-action");
+        set_status(app, "  Connection failed", "status-disconnected");
+    }
+
+    if (app->sld_area)
+        gtk_widget_queue_draw(app->sld_area);
+}
+
 static void on_connect_clicked(GtkButton *btn, gpointer user_data) {
     (void)btn;
     AppState *app = (AppState *)user_data;
@@ -250,19 +316,15 @@ static void on_connect_clicked(GtkButton *btn, gpointer user_data) {
             gtk_widget_queue_draw(app->sld_area);
         return;
     }
-    
-    app_connect(app);
-    sld_connect_bays(app);
 
-    if (app->explorer_connected) {
-        gtk_button_set_label(GTK_BUTTON(app->connect_btn), "  Disconnect");
-        gtk_widget_add_css_class(app->connect_btn, "destructive-action");
-        
-        /* Automatically enable auto poll upon successful connection */
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app->auto_poll_btn), TRUE);
-    }
-    if (app->sld_area)
-        gtk_widget_queue_draw(app->sld_area);
+    const char *host = gtk_editable_get_text(GTK_EDITABLE(app->host_entry));
+    int port = atoi(gtk_editable_get_text(GTK_EDITABLE(app->port_entry)));
+
+    gtk_widget_set_sensitive(app->connect_btn, FALSE);
+    gtk_button_set_label(GTK_BUTTON(app->connect_btn), "  Connecting...");
+    set_status(app, "  Connecting...", "status-info");
+
+    app_connect_async(app, host, port, on_connect_finish, app);
 }
 
 static void on_read_all_clicked(GtkButton *btn, gpointer user_data) {
@@ -284,7 +346,7 @@ static void on_auto_poll_toggled(GtkToggleButton *btn, gpointer user_data) {
     app->auto_poll = gtk_toggle_button_get_active(btn);
     if (app->auto_poll) {
         if (app->poll_timer_id == 0) {
-            app->poll_timer_id = g_timeout_add(1000, auto_poll_tick, app);
+            app->poll_timer_id = g_timeout_add(2500, auto_poll_tick, app);
         }
     } else {
         if (app->poll_timer_id != 0) {

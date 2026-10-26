@@ -139,12 +139,25 @@ typedef struct {
     int             sld_equipment_count;
 } AppState;
 
+/* ---- Async connection payload ---- */
+
+typedef struct {
+    AppState     *app;
+    char          host[128];
+    int           port;
+    gboolean      success;
+    IedModelNode *model;
+} ConnectTaskData;
+
 /* ---- iec61850_conn.h ---- */
 
 void           app_connect          (AppState *app);
+void           app_connect_async    (AppState *app, const char *host, int port, GAsyncReadyCallback callback, gpointer user_data);
+void           discover_ln_children (IedConnection con, IedModelNode *lnNode);
 void           app_disconnect       (AppState *app);
 IedModelNode  *discover_model_con   (IedConnection con);
 void           app_read_all_values  (AppState *app);
+IedModelNode  *ied_model_node_new   (const char *name, const char *ref, NodeType type);
 void           ied_model_node_free  (IedModelNode *node);
 
 /* SLD bay connections (separate from explorer) */

@@ -12,6 +12,7 @@ typedef struct {
 
 static ActiveControlSession g_active_session = {0};
 static GMutex g_active_session_mutex;
+static int decodeDbpos(const MmsValue* dbposVal);
 
 #include "iec61850_client.h"
 #include "iec61850_common.h"
@@ -27,7 +28,7 @@ static GMutex g_active_session_mutex;
 /*  Data-model tree helpers                                           */
 /* ------------------------------------------------------------------ */
 
-static IedModelNode *
+IedModelNode *
 ied_model_node_new(const char *name, const char *ref, NodeType type)
 {
     IedModelNode *n = g_new0(IedModelNode, 1);
@@ -110,6 +111,34 @@ discover_data_attributes(IedConnection con, IedModelNode *parent, const char *do
 /*  Full model discovery  (LD → LN → DO → DA)                        */
 /* ------------------------------------------------------------------ */
 
+void
+discover_ln_children(IedConnection con, IedModelNode *lnNode)
+{
+    if (!con || !lnNode) return;
+    if (lnNode->children && lnNode->children->len > 0) return; /* Already discovered */
+
+    IedClientError err;
+    LinkedList doList = IedConnection_getLogicalNodeDirectory(
+        con, &err, lnNode->ref, ACSI_CLASS_DATA_OBJECT);
+    if (!doList) return;
+
+    LinkedList dobj = LinkedList_getNext(doList);
+    while (dobj) {
+        const char *doName = (const char *)dobj->data;
+        char doRef[256];
+        snprintf(doRef, sizeof(doRef), "%s.%s", lnNode->ref, doName);
+
+        IedModelNode *doNode = ied_model_node_new(doName, doRef, NODE_DO);
+        g_ptr_array_add(lnNode->children, doNode);
+
+        /* Discover data attributes of this DO */
+        discover_data_attributes(con, doNode, doRef);
+
+        dobj = LinkedList_getNext(dobj);
+    }
+    LinkedList_destroy(doList);
+}
+
 IedModelNode *
 discover_model_con(IedConnection con)
 {
@@ -142,26 +171,9 @@ discover_model_con(IedConnection con)
                 IedModelNode *lnNode = ied_model_node_new(lnName, lnRef, NODE_LN);
                 g_ptr_array_add(ldNode->children, lnNode);
 
-                /* --- Data Objects --- */
-                LinkedList doList = IedConnection_getLogicalNodeDirectory(
-                    con, &err, lnRef, ACSI_CLASS_DATA_OBJECT);
-                if (doList) {
-                    LinkedList dobj = LinkedList_getNext(doList);
-                    while (dobj) {
-                        const char *doName = (const char *)dobj->data;
-                        char doRef[256];
-                        snprintf(doRef, sizeof(doRef), "%s/%s.%s", ldName, lnName, doName);
-
-                        IedModelNode *doNode = ied_model_node_new(doName, doRef, NODE_DO);
-                        g_ptr_array_add(lnNode->children, doNode);
-
-                        /* --- Data Attributes (recursive) --- */
-                        discover_data_attributes(con, doNode, doRef);
-
-                        dobj = LinkedList_getNext(dobj);
-                    }
-                    LinkedList_destroy(doList);
-                }
+                /* Note: Child DOs and DAs are discovered on-demand via discover_ln_children()
+                 * when an LN is selected or read. This reduces initial connection over VPN
+                 * from minutes down to milliseconds! */
 
                 ln = LinkedList_getNext(ln);
             }
@@ -191,8 +203,9 @@ update_ui_from_report(gpointer user_data)
 
     g_print("[REPORT PUSH] Received from %s with %d entries\n", rd->rcb_ref, rd->count);
 
-    /* Trigger background refresh of the SLD instantly */
-    app_read_all_values(app);
+    /* Redraw SLD to reflect any updated telemetry without triggering a poll storm */
+    if (app->sld_area)
+        gtk_widget_queue_draw(app->sld_area);
 
     g_free(rd);
     return G_SOURCE_REMOVE;
@@ -222,6 +235,24 @@ report_callback(void *parameter, ClientReport report)
                 if (val) {
                     MmsValue_printToBuffer(val, rd->entries[rd->count], REPORT_ENTRY_LEN);
                     rd->count++;
+
+                    /* If report contains explicit data reference, update SLD state directly in memory */
+                    if (ClientReport_hasDataReference(report)) {
+                        const char *dataRef = ClientReport_getDataReference(report, i);
+                        if (dataRef) {
+                            for (int ei = 0; ei < app->sld_equipment_count; ei++) {
+                                if (g_strcmp0(app->sld_equipment[ei].ref, dataRef) == 0) {
+                                    int prev = app->sld_equipment[ei].state;
+                                    app->sld_equipment[ei].state = decodeDbpos(val);
+                                    if (prev != app->sld_equipment[ei].state) {
+                                        g_print("[REPORT -> SLD] %s : %d -> %d\n",
+                                                dataRef, prev, app->sld_equipment[ei].state);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -300,6 +331,62 @@ subscribe_reports_con(IedConnection con, IedModelNode *model_root,
 /*  Connect / Disconnect                                              */
 /* ------------------------------------------------------------------ */
 
+static void
+connect_worker_thread(GTask *task, gpointer source, gpointer data, GCancellable *cancel)
+{
+    (void)task; (void)source; (void)cancel;
+    ConnectTaskData *cd = (ConnectTaskData *)data;
+    AppState *app = cd->app;
+
+    if (app->explorer_connected) {
+        cd->success = TRUE;
+        g_task_return_boolean(task, TRUE);
+        return;
+    }
+
+    app->explorer_con = IedConnection_create();
+    IedConnection_setConnectTimeout(app->explorer_con, 3000);
+    IedConnection_setRequestTimeout(app->explorer_con, 3000);
+
+    g_print("Connecting to %s:%d ...\n", cd->host, cd->port);
+    IedClientError err;
+    IedConnection_connect(app->explorer_con, &err, cd->host, cd->port);
+
+    if (err != IED_ERROR_OK) {
+        g_printerr("Connection failed (err %d)\n", err);
+        IedConnection_destroy(app->explorer_con);
+        app->explorer_con = NULL;
+        cd->success = FALSE;
+        g_task_return_boolean(task, FALSE);
+        return;
+    }
+
+    app->explorer_connected = TRUE;
+
+    /* Discover model (fast LD/LN discovery) */
+    cd->model = discover_model_con(app->explorer_con);
+    cd->success = TRUE;
+
+    /* Also connect bays */
+    sld_connect_bays(app);
+
+    g_task_return_boolean(task, TRUE);
+}
+
+void
+app_connect_async(AppState *app, const char *host, int port, GAsyncReadyCallback callback, gpointer user_data)
+{
+    ConnectTaskData *cd = g_new0(ConnectTaskData, 1);
+    cd->app = app;
+    g_strlcpy(cd->host, host ? host : "127.0.0.1", sizeof(cd->host));
+    cd->port = port;
+
+    GTask *task = g_task_new(NULL, NULL, callback, user_data);
+    g_task_set_task_data(task, cd, (GDestroyNotify)g_free);
+    g_task_run_in_thread(task, connect_worker_thread);
+    g_object_unref(task);
+}
+
 void
 app_connect(AppState *app)
 {
@@ -312,8 +399,8 @@ app_connect(AppState *app)
     if (app->explorer_connected) return;
 
     app->explorer_con = IedConnection_create();
-    IedConnection_setConnectTimeout(app->explorer_con, 2000);
-    IedConnection_setRequestTimeout(app->explorer_con, 2000);
+    IedConnection_setConnectTimeout(app->explorer_con, 3000);
+    IedConnection_setRequestTimeout(app->explorer_con, 3000);
 
     g_print("Connecting to %s:%d ...\n", host, port);
     IedConnection_connect(app->explorer_con, &err, host, port);
@@ -401,8 +488,8 @@ sld_connect_bays(AppState *app)
         if (bay->connected) continue;
 
         bay->con = IedConnection_create();
-        IedConnection_setConnectTimeout(bay->con, 500);
-        IedConnection_setRequestTimeout(bay->con, 500);
+        IedConnection_setConnectTimeout(bay->con, 2000);
+        IedConnection_setRequestTimeout(bay->con, 2000);
 
         g_print("[SLD] Connecting bay %d: %s:%d ...\n", i, bay->host, bay->port);
         IedConnection_connect(bay->con, &err, bay->host, bay->port);
@@ -902,40 +989,30 @@ static void
 map_mms_to_children(IedConnection con, IedModelNode *node,
                     MmsValue *val, const char *fc_name)
 {
-    if (!node) return;
+    (void)con;
+    if (!node || !val) return;
 
     /* Tag the node with its FC */
     if (!node->fc && fc_name) node->fc = g_strdup(fc_name);
 
-    /* If val is NULL (parent couldn't be read), still try to read
-     * children individually — this handles the initial call case. */
-    MmsType t = val ? MmsValue_getType(val) : MMS_DATA_ACCESS_ERROR;
+    MmsType t = MmsValue_getType(val);
+    if (t == MMS_DATA_ACCESS_ERROR) return;
 
+    /* Store value summary on the node */
+    store_mms_value(node, val);
+
+    /* If it is a structure, unpack child elements directly from in-memory val without extra network calls! */
     if (t == MMS_STRUCTURE && node->children && node->children->len > 0) {
-        /* Store a summary on the structured node itself */
-        store_mms_value(node, val);
-
-        /* Read each child DA individually by its full reference path.
-         * This guarantees correct value-to-node mapping regardless of
-         * directory vs. structure ordering differences. */
-        FunctionalConstraint fc = FunctionalConstraint_fromString(fc_name);
-
+        int elemCount = MmsValue_getArraySize(val);
         for (guint i = 0; i < node->children->len; i++) {
             IedModelNode *child = g_ptr_array_index(node->children, i);
-            IedClientError err;
-
-            MmsValue *child_val = IedConnection_readObject(
-                con, &err, child->ref, fc);
-
-            if (child_val &&
-                MmsValue_getType(child_val) != MMS_DATA_ACCESS_ERROR) {
-                map_mms_to_children(con, child, child_val, fc_name);
+            if ((int)i < elemCount) {
+                MmsValue *child_val = MmsValue_getElement(val, (int)i);
+                if (child_val) {
+                    map_mms_to_children(con, child, child_val, fc_name);
+                }
             }
-
-            if (child_val) MmsValue_delete(child_val);
         }
-    } else if (val) {
-        store_mms_value(node, val);
     }
 }
 
@@ -952,53 +1029,34 @@ map_mms_to_children(IedConnection con, IedModelNode *node,
 static void
 read_ln_values(IedConnection con, IedModelNode *ln)
 {
+    if (!con || !ln) return;
+
+    /* Ensure this LN's DOs and DAs have been discovered */
+    if (ln->children->len == 0) {
+        discover_ln_children(con, ln);
+    }
+
     for (guint di = 0; di < ln->children->len; di++) {
         IedModelNode *do_node = g_ptr_array_index(ln->children, di);
         if (do_node->type != NODE_DO) continue;
 
-        /* Try each FC */
-        for (int fi = 0; fi < NUM_READ_FCS; fi++) {
+        /* Directly iterate over this DO's child DAs, avoiding 8 FC getDataDirectory network roundtrips */
+        for (guint ci = 0; ci < do_node->children->len; ci++) {
+            IedModelNode *da = g_ptr_array_index(do_node->children, ci);
+            if (!da) continue;
+
+            const char *fc_name = da->fc ? da->fc : "ST";
+            FunctionalConstraint fc = FunctionalConstraint_fromString(fc_name);
+            if (fc == IEC61850_FC_ALL) continue;
+
             IedClientError err;
-            FunctionalConstraint fc = READ_FCS[fi];
-            const char *fc_name = READ_FC_NAMES[fi];
+            MmsValue *val = IedConnection_readObject(con, &err, da->ref, fc);
 
-            /* Get the DA names for this FC */
-            LinkedList daNames = IedConnection_getDataDirectoryByFC(
-                con, &err, do_node->ref, fc);
-            if (!daNames) continue;
-
-            /* Check if there are any DAs for this FC */
-            LinkedList first = LinkedList_getNext(daNames);
-            if (!first) {
-                LinkedList_destroy(daNames);
-                continue;
+            if (val && MmsValue_getType(val) != MMS_DATA_ACCESS_ERROR) {
+                map_mms_to_children(con, da, val, fc_name);
             }
 
-            /* Read each DA individually by its full reference path.
-             * This guarantees each value is assigned to the correct
-             * node regardless of ordering differences. */
-            LinkedList entry = first;
-            while (entry) {
-                const char *daName = (const char *)entry->data;
-                IedModelNode *da = find_child_by_name(do_node, daName);
-
-                if (da) {
-                    MmsValue *val = IedConnection_readObject(
-                        con, &err, da->ref, fc);
-
-                    if (val && MmsValue_getType(val) != MMS_DATA_ACCESS_ERROR) {
-                        g_print("  Read OK: %s [%s] type=%s\n",
-                                da->ref, fc_name,
-                                mms_type_name(MmsValue_getType(val)));
-                        map_mms_to_children(con, da, val, fc_name);
-                    }
-
-                    if (val) MmsValue_delete(val);
-                }
-
-                entry = LinkedList_getNext(entry);
-            }
-            LinkedList_destroy(daNames);
+            if (val) MmsValue_delete(val);
         }
     }
 }
@@ -1056,11 +1114,15 @@ read_all_values_thread(GTask *task, gpointer source_object, gpointer task_data, 
     g_task_return_boolean(task, TRUE);
 }
 
+static gint g_read_all_in_progress = 0;
+
 static void
 read_all_values_finish(GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
     (void)source_object; (void)res;
     AppState *app = (AppState *)user_data;
+
+    g_atomic_int_set(&g_read_all_in_progress, 0);
 
     if (app->sld_area)
         gtk_widget_queue_draw(app->sld_area);
@@ -1082,9 +1144,17 @@ read_all_values_finish(GObject *source_object, GAsyncResult *res, gpointer user_
 void
 app_read_all_values(AppState *app)
 {
+    /* Prevent concurrent / overlapping read tasks over high-latency VPN */
+    if (!g_atomic_int_compare_and_exchange(&g_read_all_in_progress, 0, 1)) {
+        if (!app->auto_poll) {
+            g_print("[READ] A read operation is already in progress, skipping.\n");
+        }
+        return;
+    }
+
     if (!app->auto_poll) {
         g_print("Reading all values...\n");
-        set_status(app, "  Reading all values…", "status-info");
+        set_status(app, "  Reading all values...", "status-info");
     }
 
     GTask *task = g_task_new(NULL, NULL, read_all_values_finish, app);
@@ -1571,7 +1641,7 @@ control_operate_thread(GTask *task, gpointer source, gpointer data, GCancellable
         g_print("[CONTROL] SBO Select successful. Session kept alive for subsequent Operate.\n");
     } else {
         /* Wait for CommandTermination callback before destroying */
-        Thread_sleep(1000);
+        Thread_sleep(200);
         ControlObjectClient_destroy(ctlObj);
     }
 
